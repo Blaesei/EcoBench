@@ -3,13 +3,12 @@
 $site_name = "EcoBench";
 $site_tagline = "Sustainable Smart Bench Technology";
 
-// Navigation items
+// Navigation items - Public pages only
 $nav_items = [
-    'Home' => '#home',
-    'FAQs' => '#faqs',
-    'Dashboard' => '#dashboard',
-    'Prototype' => '#prototype',
-    'Contact' => '#contact'
+    'Home' => 'index.php',
+    'FAQs' => 'faqs.php',
+    'About Us' => 'about.php',
+    'Contact' => 'contact.php'
 ];
 
 // Slideshow images (add your image paths here)
@@ -75,16 +74,16 @@ $features = [
     <header id="header">
         <div class="container">
             <div class="header-content">
-                <a href="#home" class="logo">
+                <a href="index.php" class="logo">
                     <img class="logo-icon" src="img/EcoBench Logo.png" alt="EcoBench Logo">
                 </a>
 
                 <nav class="nav-menu" id="navMenu">
                     <ul>
                         <?php foreach ($nav_items as $name => $link): ?>
-                            <li><a href="<?php echo $link; ?>" class="nav-link"><?php echo $name; ?></a></li>
+                            <li><a href="<?php echo $link; ?>" class="nav-link <?php echo ($name === 'Home') ? 'active' : ''; ?>"><?php echo $name; ?></a></li>
                         <?php endforeach; ?>
-                        <li><a href="#signin" class="nav-link sign-in-btn">Sign in</a></li>
+                        <li><a href="signin.php" class="nav-link sign-in-btn">Sign in</a></li>
                     </ul>
                 </nav>
 
@@ -115,12 +114,12 @@ $features = [
             </h1>
             <p class="hero-description">
                 A sustainable smart bench that combines renewable-powered device charging, seating,
-                and real-time energy monitoring for the use of Polytechnic University of the Philippines –
+                and real-time energy monitoring for the use of Polytechnic University of the Philippines —
                 Institute of Technology.
             </p>
             <div class="hero-buttons">
-                <a href="#dashboard" class="btn btn-primary">View Dashboard</a>
-                <a href="#prototype" class="btn btn-secondary">See Prototype</a>
+                <a href="faqs.php" class="btn btn-primary">Learn More</a>
+                <a href="contact.php" class="btn btn-secondary">Get in Touch</a>
             </div>
 
             <!-- Slideshow Controls -->
@@ -185,6 +184,17 @@ $features = [
         </div>
     </section>
 
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Want to See More?</h2>
+                <p>Sign in to access our interactive dashboard and prototype showcase</p>
+                <a href="signin.php" class="btn btn-primary btn-large">Sign In Now</a>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
@@ -206,18 +216,19 @@ $features = [
                     <div class="footer-column">
                         <h4>Quick Links</h4>
                         <ul>
-                            <li><a href="#home">Home</a></li>
-                            <li><a href="#dashboard">Dashboard</a></li>
-                            <li><a href="#prototype">Prototype</a></li>
+                            <li><a href="index.php">Home</a></li>
+                            <li><a href="faqs.php">FAQs</a></li>
+                            <li><a href="bout.php">About Us</a></li>
+                            <li><a href="contact.php">Contact</a></li>
                         </ul>
                     </div>
 
                     <div class="footer-column">
-                        <h4>Support</h4>
+                        <h4>For Users</h4>
                         <ul>
-                            <li><a href="#faqs">FAQs</a></li>
-                            <li><a href="#contact">Contact</a></li>
-                            <li><a href="#feedback">Feedback</a></li>
+                            <li><a href="signin.php">Sign In</a></li>
+                            <li><a href="faqs.php">Help Center</a></li>
+                            <li><a href="contact.php">Feedback</a></li>
                         </ul>
                     </div>
 

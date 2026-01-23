@@ -1,68 +1,11 @@
-<?php
-// ==============================================================
-// ECOBENCH MONITORING SYSTEM - SUSTAINABLE ENERGY DASHBOARD
-// Clean, eco-friendly, and futuristic design
-// ==============================================================
-
-// Mock Data Configuration
-$systemData = [
-    'current_watts' => 145.7,
-    'voltage' => 12.4,
-    'battery_percent' => 78,
-    'charge_rate' => 2.3,
-    'is_charging' => true,
-    'runtime_hours' => 6.5,
-    'crank_active' => false,
-    'solar_power' => 132.5,
-    'manual_power' => 13.2,
-    'total_generated_today' => 3450,
-    'total_consumed_today' => 2180
-];
-
-// Energy efficiency score (0-100)
-$efficiencyScore = 87;
-
-// Monthly generation comparison
-$monthlyData = [
-    ['month' => 'Jan', 'solar' => 2100, 'manual' => 180],
-    ['month' => 'Feb', 'solar' => 2450, 'manual' => 210],
-    ['month' => 'Mar', 'solar' => 3200, 'manual' => 250],
-    ['month' => 'Apr', 'solar' => 3800, 'manual' => 290],
-    ['month' => 'May', 'solar' => 4200, 'manual' => 310]
-];
-
-// Hourly power generation today (realistic solar curve)
-$hourlyData = [
-    ['hour' => '00', 'power' => 0], ['hour' => '01', 'power' => 0], ['hour' => '02', 'power' => 0],
-    ['hour' => '03', 'power' => 0], ['hour' => '04', 'power' => 0], ['hour' => '05', 'power' => 0],
-    ['hour' => '06', 'power' => 15], ['hour' => '07', 'power' => 45], ['hour' => '08', 'power' => 85],
-    ['hour' => '09', 'power' => 125], ['hour' => '10', 'power' => 155], ['hour' => '11', 'power' => 175],
-    ['hour' => '12', 'power' => 185], ['hour' => '13', 'power' => 180], ['hour' => '14', 'power' => 165],
-    ['hour' => '15', 'power' => 140], ['hour' => '16', 'power' => 105], ['hour' => '17', 'power' => 65],
-    ['hour' => '18', 'power' => 25], ['hour' => '19', 'power' => 5], ['hour' => '20', 'power' => 0],
-    ['hour' => '21', 'power' => 0], ['hour' => '22', 'power' => 0], ['hour' => '23', 'power' => 0]
-];
-
-// Active power sources
-$powerSources = [
-    ['name' => 'Solar Panel', 'power' => 132.5, 'status' => 'active'],
-    ['name' => 'Manual Crank', 'power' => 13.2, 'status' => 'active'],
-    ['name' => 'Battery Storage', 'power' => 0, 'status' => 'charging']
-];
-
-// Environmental impact
-$co2Saved = 2.45; // kg today
-$treesEquivalent = 0.11;
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoBench - Sustainable Energy Dashboard</title>
+    <title>EcoBench - Dashboard</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -79,19 +22,6 @@ $treesEquivalent = 0.11;
         .sidebar {
             background: linear-gradient(180deg, #166534 0%, #15803d 100%);
             box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            border: 1px solid rgba(34, 197, 94, 0.1);
-        }
-        
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(34, 197, 94, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         
         .nav-item {
@@ -112,51 +42,108 @@ $treesEquivalent = 0.11;
             color: white;
         }
         
-        .stat-badge {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-            color: white;
-            font-weight: 600;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+        /* E-ink Display Style */
+        .eink-display {
+            background: #f5f5f0;
+            border: 4px solid #2d2d2d;
+            border-radius: 8px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.15);
+            padding: 32px;
+            position: relative;
         }
         
-        .pulse-dot {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        .eink-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0,0,0,0.02) 2px,
+                    rgba(0,0,0,0.02) 4px
+                );
+            pointer-events: none;
+            border-radius: 4px;
+        }
+        
+        .eink-text {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        
+        .eink-border {
+            border: 2px solid #2d2d2d;
+        }
+        
+        /* Battery Display */
+        .battery-display {
+            background: white;
+            border: 3px solid #2d2d2d;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .battery-level {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            transition: width 1s ease;
+        }
+        
+        .battery-terminal {
+            width: 8px;
+            height: 40px;
+            background: #2d2d2d;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        /* Port Status */
+        .port-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 3px solid #2d2d2d;
+            transition: all 0.3s ease;
+        }
+        
+        .port-indicator.charging {
+            background: #22c55e;
+            box-shadow: 0 0 12px rgba(34, 197, 94, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        .port-indicator.available {
+            background: #e5e7eb;
         }
         
         @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.6; transform: scale(1.1); }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
         }
         
-        .glow-green {
-            box-shadow: 0 0 30px rgba(34, 197, 94, 0.4), 0 0 60px rgba(34, 197, 94, 0.2);
+        /* Power Source Indicator */
+        .power-source {
+            background: white;
+            border: 2px solid #2d2d2d;
+            border-radius: 8px;
+            transition: all 0.3s ease;
         }
         
-        .glow-yellow {
-            box-shadow: 0 0 30px rgba(251, 191, 36, 0.4), 0 0 60px rgba(251, 191, 36, 0.2);
+        .power-source.active {
+            background: #dcfce7;
+            border-color: #22c55e;
         }
         
-        .progress-ring {
-            transform: rotate(-90deg);
-        }
-        
-        .gradient-green {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-        }
-        
-        .gradient-yellow {
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-        }
-        
-        .gradient-blue {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-        }
-        
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
         }
         
         @keyframes float {
@@ -164,8 +151,43 @@ $treesEquivalent = 0.11;
             50% { transform: translateY(-10px); }
         }
         
-        .float-animation {
-            animation: float 3s ease-in-out infinite;
+        /* Segment Display Numbers */
+        .segment-display {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 0px rgba(0,0,0,0.2);
+        }
+        
+        /* Warning Alert */
+        .warning-alert {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            animation: warningBlink 2s infinite;
+        }
+        
+        @keyframes warningBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* Energy Balance Bar */
+        .energy-bar {
+            background: white;
+            border: 2px solid #2d2d2d;
+            border-radius: 8px;
+            height: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .energy-bar-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            transition: width 0.5s ease;
         }
     </style>
     
@@ -176,7 +198,6 @@ $treesEquivalent = 0.11;
                     colors: {
                         primary: '#22c55e',
                         secondary: '#fbbf24',
-                        accent: '#84cc16',
                     }
                 }
             }
@@ -201,41 +222,27 @@ $treesEquivalent = 0.11;
             </div>
             
             <nav class="space-y-2">
+                <a href="index.php" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
+                    <i class="fas fa-home w-5"></i>
+                    <span>Home</span>
+                </a>
+                <a href="pro_faqs.php" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
+                    <i class="fas fa-question-circle w-5"></i>
+                    <span>FAQs</span>
+                </a>
                 <a href="#" class="nav-item active flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
                     <i class="fas fa-chart-line w-5"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
-                    <i class="fas fa-bolt w-5"></i>
-                    <span>Power Sources</span>
+                <a href="prototype.php" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
+                    <i class="fas fa-cube w-5"></i>
+                    <span>Prototype</span>
                 </a>
-                <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
-                    <i class="fas fa-battery-three-quarters w-5"></i>
-                    <span>Battery Status</span>
-                </a>
-                <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
-                    <i class="fas fa-chart-bar w-5"></i>
-                    <span>Analytics</span>
-                </a>
-                <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
-                    <i class="fas fa-leaf w-5"></i>
-                    <span>Environmental</span>
-                </a>
-                <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
-                    <i class="fas fa-cog w-5"></i>
-                    <span>Settings</span>
+                <a href="pro_contact.php" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
+                    <i class="fas fa-envelope w-5"></i>
+                    <span>Contact</span>
                 </a>
             </nav>
-        </div>
-        
-        <div class="absolute bottom-0 left-0 right-0 p-6">
-            <div class="glass-effect rounded-xl p-4 border border-white/20">
-                <div class="flex items-center gap-3 mb-2">
-                    <div class="w-3 h-3 bg-green-400 rounded-full pulse-dot"></div>
-                    <span class="text-xs text-gray-700 font-semibold">System Status</span>
-                </div>
-                <p class="text-sm font-bold text-green-700">All Systems Online</p>
-            </div>
         </div>
     </aside>
 
@@ -243,255 +250,272 @@ $treesEquivalent = 0.11;
     <main class="flex-1 lg:ml-64 p-6 md:p-8">
         
         <!-- HEADER -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-            <div>
-                <h1 class="text-4xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent mb-2">Energy Dashboard</h1>
-                <p class="text-gray-600 text-sm font-medium">Real-time sustainable power monitoring</p>
-            </div>
-            
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent mb-2">EcoBench Dashboard</h1>
+            <p class="text-gray-600 text-sm font-medium">Real-time monitoring and status display</p>
+        </div>
+
+        <!-- LOW BATTERY WARNING -->
+        <div id="lowBatteryWarning" class="warning-alert rounded-lg p-4 mb-6 hidden">
             <div class="flex items-center gap-3">
-                <div class="flex bg-white rounded-xl p-1 shadow-md border border-green-100">
-                    <button class="px-5 py-2 gradient-green text-white rounded-lg text-sm font-semibold shadow-sm">TODAY</button>
-                    <button class="px-5 py-2 text-gray-600 text-sm font-semibold hover:text-green-600 transition-colors">WEEK</button>
-                    <button class="px-5 py-2 text-gray-600 text-sm font-semibold hover:text-green-600 transition-colors">MONTH</button>
-                </div>
-                <div class="text-right bg-white px-4 py-2 rounded-xl shadow-md border border-green-100">
-                    <p class="text-xs text-gray-500 font-medium">Current Date</p>
-                    <p class="text-sm font-bold text-gray-800"><?php echo date('F Y'); ?></p>
+                <i class="fas fa-exclamation-triangle text-orange-600 text-2xl"></i>
+                <div>
+                    <p class="font-bold text-orange-900">LOW BATTERY WARNING</p>
+                    <p class="text-sm text-orange-800">Battery level below 20%. Please enable manual crank or wait for solar charging.</p>
                 </div>
             </div>
         </div>
 
-        <!-- TOP METRICS ROW -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            
-            <!-- Total Power Generated Today -->
-            <div class="card p-6">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <p class="text-gray-500 text-xs uppercase tracking-wide font-semibold mb-2">Total Generated</p>
-                        <h3 class="text-4xl font-bold text-green-600" id="totalGenerated"><?php echo number_format($systemData['total_generated_today']); ?></h3>
-                        <p class="text-xs text-gray-500 mt-1 font-medium">Wh today</p>
-                    </div>
-                    <div class="w-14 h-14 gradient-green rounded-2xl flex items-center justify-center shadow-lg">
-                        <i class="fas fa-solar-panel text-white text-2xl"></i>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="stat-badge">↑ 12.5%</span>
-                    <span class="text-xs text-gray-500 font-medium">vs yesterday</span>
-                </div>
+        <!-- E-INK STYLE MAIN DISPLAY -->
+        <div class="eink-display mb-8">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold eink-text mb-2">PUP INSTITUTE OF TECHNOLOGY</h2>
+                <p class="text-sm eink-text opacity-70">SUSTAINABLE ENERGY BENCH SYSTEM</p>
             </div>
 
-            <!-- Current Power Input -->
-            <div class="card p-6">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <p class="text-gray-500 text-xs uppercase tracking-wide font-semibold mb-2">Power Input</p>
-                        <h3 class="text-4xl font-bold text-yellow-600" id="currentPower"><?php echo number_format($systemData['current_watts'], 1); ?></h3>
-                        <p class="text-xs text-gray-500 mt-1 font-medium">Watts</p>
-                    </div>
-                    <div class="w-14 h-14 gradient-yellow rounded-2xl flex items-center justify-center shadow-lg">
-                        <i class="fas fa-bolt text-white text-2xl"></i>
-                    </div>
-                </div>
-                <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
-                    <div class="h-full bg-gradient-to-r from-yellow-400 to-green-500 rounded-full transition-all duration-500" style="width: 73%"></div>
-                </div>
-            </div>
-
-            <!-- Battery Status -->
-            <div class="card p-6">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <p class="text-gray-500 text-xs uppercase tracking-wide font-semibold mb-2">Battery Level</p>
-                        <h3 class="text-4xl font-bold text-blue-600"><?php echo $systemData['battery_percent']; ?>%</h3>
-                        <p class="text-xs text-gray-500 mt-1 font-medium"><?php echo $systemData['voltage']; ?>V</p>
-                    </div>
-                    <div class="w-14 h-14 gradient-blue rounded-2xl flex items-center justify-center shadow-lg">
-                        <i class="fas fa-battery-three-quarters text-white text-2xl"></i>
-                    </div>
-                </div>
-                <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
-                    <div class="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full transition-all duration-500" style="width: <?php echo $systemData['battery_percent']; ?>%"></div>
-                </div>
-            </div>
-
-            <!-- Runtime Estimate -->
-            <div class="card p-6">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <p class="text-gray-500 text-xs uppercase tracking-wide font-semibold mb-2">Est. Runtime</p>
-                        <h3 class="text-4xl font-bold text-purple-600"><?php echo number_format($systemData['runtime_hours'], 1); ?></h3>
-                        <p class="text-xs text-gray-500 mt-1 font-medium">Hours</p>
-                    </div>
-                    <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
-                        <i class="fas fa-clock text-white text-2xl"></i>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <i class="fas fa-info-circle text-gray-400 text-xs"></i>
-                    <span class="text-xs text-gray-500 font-medium">At current load</span>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- MAIN DASHBOARD GRID -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            
-            <!-- POWER GENERATION CHART (Large) -->
-            <div class="lg:col-span-2 card p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <div>
-                        <h3 class="text-xl font-bold text-gray-800">Power Generation Today</h3>
-                        <p class="text-sm text-gray-500 font-medium">Real-time energy production</p>
-                    </div>
-                    <div class="w-3 h-3 bg-green-500 rounded-full pulse-dot"></div>
-                </div>
-                <div style="position: relative; height: 300px;">
-                    <canvas id="powerGenerationChart"></canvas>
-                </div>
-            </div>
-
-            <!-- ENERGY EFFICIENCY SCORE -->
-            <div class="card p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-6">Energy Efficiency</h3>
-                <div class="flex justify-center items-center mb-6">
-                    <div class="relative w-48 h-48">
-                        <svg class="w-full h-full" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="45" fill="none" stroke="#e5e7eb" stroke-width="8"/>
-                            <circle cx="50" cy="50" r="45" fill="none" stroke="url(#gradient)" stroke-width="8" 
-                                    stroke-dasharray="<?php echo ($efficiencyScore / 100) * 283; ?> 283" 
-                                    class="progress-ring" stroke-linecap="round"/>
-                            <defs>
-                                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" style="stop-color:#22c55e;stop-opacity:1" />
-                                    <stop offset="100%" style="stop-color:#fbbf24;stop-opacity:1" />
-                                </linearGradient>
-                            </defs>
-                        </svg>
-                        <div class="absolute inset-0 flex flex-col items-center justify-center">
-                            <span class="text-5xl font-bold bg-gradient-to-r from-green-600 to-yellow-500 bg-clip-text text-transparent"><?php echo $efficiencyScore; ?></span>
-                            <span class="text-sm text-gray-500 font-semibold mt-1">Score</span>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                
+                <!-- LEFT COLUMN: BATTERY & POWER -->
+                <div>
+                    <!-- BATTERY STATUS -->
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-lg font-bold eink-text">BATTERY STATUS</h3>
+                            <span class="segment-display text-2xl eink-text" id="batteryPercent">78%</span>
                         </div>
-                    </div>
-                </div>
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center p-3 bg-green-50 rounded-xl border border-green-100">
-                        <span class="text-sm text-gray-700 font-medium">Solar Efficiency</span>
-                        <span class="text-sm font-bold text-green-600">92%</span>
-                    </div>
-                    <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-xl border border-yellow-100">
-                        <span class="text-sm text-gray-700 font-medium">Manual Efficiency</span>
-                        <span class="text-sm font-bold text-yellow-600">78%</span>
-                    </div>
-                    <div class="flex justify-between items-center p-3 bg-blue-50 rounded-xl border border-blue-100">
-                        <span class="text-sm text-gray-700 font-medium">Storage Efficiency</span>
-                        <span class="text-sm font-bold text-blue-600">91%</span>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- SECOND ROW -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            
-            <!-- ACTIVE POWER SOURCES -->
-            <div class="card p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-6">Active Power Sources</h3>
-                <div class="space-y-4">
-                    <?php foreach ($powerSources as $index => $source): ?>
-                    <div class="flex items-center justify-between p-4 <?php echo $index === 0 ? 'bg-green-50 border-green-200' : ($index === 1 ? 'bg-yellow-50 border-yellow-200' : 'bg-blue-50 border-blue-200'); ?> rounded-xl border">
-                        <div class="flex items-center gap-3">
-                            <div class="w-3 h-3 rounded-full <?php echo $source['status'] === 'active' ? 'bg-green-500 pulse-dot' : 'bg-blue-500'; ?>"></div>
-                            <div>
-                                <p class="text-sm font-bold text-gray-800"><?php echo $source['name']; ?></p>
-                                <p class="text-xs text-gray-500 capitalize font-medium"><?php echo $source['status']; ?></p>
+                        
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="battery-display flex-1 h-20 relative">
+                                <div class="battery-level" style="width: 78%" id="batteryBar"></div>
+                                <div class="absolute inset-0 flex items-center justify-center z-10">
+                                    <i class="fas fa-bolt text-xl eink-text"></i>
+                                </div>
+                            </div>
+                            <div class="battery-terminal"></div>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-2 text-center">
+                            <div class="eink-border rounded p-2">
+                                <p class="text-xs eink-text opacity-70 mb-1">VOLTAGE</p>
+                                <p class="text-lg font-bold segment-display eink-text" id="voltage">12.4V</p>
+                            </div>
+                            <div class="eink-border rounded p-2">
+                                <p class="text-xs eink-text opacity-70 mb-1">CHARGE</p>
+                                <p class="text-lg font-bold segment-display eink-text" id="chargeRate">+2.3A</p>
+                            </div>
+                            <div class="eink-border rounded p-2">
+                                <p class="text-xs eink-text opacity-70 mb-1">RUNTIME</p>
+                                <p class="text-lg font-bold segment-display eink-text" id="runtime">6.2h</p>
                             </div>
                         </div>
-                        <span class="text-xl font-bold text-green-600"><?php echo $source['power']; ?>W</span>
                     </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
 
-            <!-- MANUAL CRANK STATUS -->
-            <div class="card p-6" id="crankCard">
-                <h3 class="text-xl font-bold text-gray-800 mb-6">Manual Crank Generator</h3>
-                <div class="text-center py-6">
-                    <div class="inline-flex items-center justify-center w-28 h-28 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full mb-4 shadow-xl" id="crankIcon">
-                        <i class="fas fa-cog text-white text-5xl"></i>
-                    </div>
-                    <p class="text-3xl font-bold text-gray-800 mb-3" id="crankPower">13.2 W</p>
-                    <span class="inline-block px-5 py-2 gradient-green text-white rounded-full text-sm font-bold shadow-md" id="crankStatus">Active</span>
-                </div>
-                <div class="mt-6 pt-6 border-t border-gray-200">
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600 font-medium">Today's Output</span>
-                        <span class="font-bold text-gray-800">245 Wh</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ENVIRONMENTAL IMPACT -->
-            <div class="card p-6 bg-gradient-to-br from-green-50 to-emerald-50">
-                <h3 class="text-xl font-bold text-gray-800 mb-6">Environmental Impact</h3>
-                <div class="space-y-6">
-                    <div class="bg-white p-4 rounded-xl border border-green-200">
-                        <div class="flex items-center gap-2 mb-3">
-                            <i class="fas fa-cloud text-green-500 text-xl"></i>
-                            <span class="text-sm text-gray-600 font-semibold">CO₂ Saved Today</span>
+                    <!-- TOTAL INCOMING POWER -->
+                    <div class="eink-border rounded p-4 mb-4 bg-white">
+                        <p class="text-xs eink-text opacity-70 mb-2">TOTAL INCOMING POWER</p>
+                        <p class="text-3xl font-bold segment-display eink-text" id="totalWatts">132.5W</p>
+                        <div class="mt-2">
+                            <p class="text-xs eink-text">Energy Balance:</p>
+                            <div class="energy-bar mt-1">
+                                <div class="energy-bar-fill" style="width: 65%" id="energyBalance"></div>
+                            </div>
+                            <p class="text-xs eink-text mt-1" id="balanceText">Charging (+65W)</p>
                         </div>
-                        <p class="text-4xl font-bold text-green-600"><?php echo $co2Saved; ?> <span class="text-xl text-gray-500">kg</span></p>
                     </div>
-                    <div class="bg-white p-4 rounded-xl border border-green-200">
-                        <div class="flex items-center gap-2 mb-3">
-                            <i class="fas fa-tree text-green-500 text-xl"></i>
-                            <span class="text-sm text-gray-600 font-semibold">Trees Equivalent</span>
+                </div>
+
+                <!-- RIGHT COLUMN: CHARGING PORTS -->
+                <div>
+                    <h3 class="text-lg font-bold eink-text mb-3">CHARGING PORTS</h3>
+                    
+                    <div class="space-y-3">
+                        <!-- Port 1 -->
+                        <div class="flex items-center justify-between p-3 bg-white eink-border rounded">
+                            <div class="flex items-center gap-3">
+                                <div class="port-indicator charging"></div>
+                                <div>
+                                    <p class="font-bold eink-text text-sm">PORT 1</p>
+                                    <p class="text-xs eink-text opacity-70">USB-C</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-bold text-green-700 text-sm">CHARGING</p>
+                                <p class="text-xs segment-display eink-text">5.0V / 2.1A</p>
+                            </div>
                         </div>
-                        <p class="text-4xl font-bold text-green-600"><?php echo $treesEquivalent; ?> <span class="text-xl text-gray-500">trees</span></p>
+
+                        <!-- Port 2 -->
+                        <div class="flex items-center justify-between p-3 bg-white eink-border rounded">
+                            <div class="flex items-center gap-3">
+                                <div class="port-indicator available"></div>
+                                <div>
+                                    <p class="font-bold eink-text text-sm">PORT 2</p>
+                                    <p class="text-xs eink-text opacity-70">Lightning</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-bold text-gray-600 text-sm">AVAILABLE</p>
+                                <p class="text-xs segment-display eink-text">Ready</p>
+                            </div>
+                        </div>
+
+                        <!-- Port 3 -->
+                        <div class="flex items-center justify-between p-3 bg-white eink-border rounded">
+                            <div class="flex items-center gap-3">
+                                <div class="port-indicator charging"></div>
+                                <div>
+                                    <p class="font-bold eink-text text-sm">PORT 3</p>
+                                    <p class="text-xs eink-text opacity-70">USB-C</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-bold text-green-700 text-sm">CHARGING</p>
+                                <p class="text-xs segment-display eink-text">5.0V / 1.8A</p>
+                            </div>
+                        </div>
+
+                        <!-- Port 4 -->
+                        <div class="flex items-center justify-between p-3 bg-white eink-border rounded">
+                            <div class="flex items-center gap-3">
+                                <div class="port-indicator available"></div>
+                                <div>
+                                    <p class="font-bold eink-text text-sm">PORT 4</p>
+                                    <p class="text-xs eink-text opacity-70">Lightning</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-bold text-gray-600 text-sm">AVAILABLE</p>
+                                <p class="text-xs segment-display eink-text">Ready</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="p-4 bg-green-600 rounded-xl shadow-lg">
-                        <p class="text-sm text-white font-semibold">🌱 Great job! You're making a positive impact on the environment.</p>
+                </div>
+
+            </div>
+
+            <!-- POWER SOURCES -->
+            <div class="border-t-2 border-gray-800 pt-4 mb-4">
+                <h3 class="text-lg font-bold eink-text mb-4">POWER SOURCES</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <!-- Solar Power -->
+                    <div class="power-source active p-3 text-center">
+                        <i class="fas fa-sun text-3xl mb-2 text-yellow-600"></i>
+                        <p class="font-bold eink-text text-sm mb-1">SOLAR PANEL</p>
+                        <p class="text-xs eink-text opacity-70 mb-1">Active</p>
+                        <p class="text-xl font-bold segment-display text-green-700" id="solarPower">132.5W</p>
+                    </div>
+
+                    <!-- Manual Crank -->
+                    <div class="power-source p-3 text-center" id="crankSource">
+                        <i class="fas fa-cog text-3xl mb-2 text-orange-600"></i>
+                        <p class="font-bold eink-text text-sm mb-1">HAND CRANK</p>
+                        <p class="text-xs eink-text opacity-70 mb-1" id="crankStatusText">Standby</p>
+                        <p class="text-xl font-bold segment-display eink-text" id="crankPower">0.0W</p>
+                    </div>
+
+                    <!-- Battery Storage -->
+                    <div class="power-source p-3 text-center">
+                        <i class="fas fa-battery-three-quarters text-3xl mb-2 text-blue-600"></i>
+                        <p class="font-bold eink-text text-sm mb-1">BATTERY</p>
+                        <p class="text-xs eink-text opacity-70 mb-1" id="batteryStatusText">Charging</p>
+                        <p class="text-xl font-bold segment-display text-blue-700" id="batteryStatus">+2.3A</p>
                     </div>
                 </div>
             </div>
 
+            <!-- USAGE ANALYTICS -->
+            <div class="border-t-2 border-gray-800 pt-4">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                    <div class="text-center eink-border rounded p-2 bg-white">
+                        <p class="text-xs eink-text opacity-70 mb-1">UPTIME</p>
+                        <p class="text-lg font-bold segment-display eink-text" id="uptime">6.5 hrs</p>
+                    </div>
+                    <div class="text-center eink-border rounded p-2 bg-white">
+                        <p class="text-xs eink-text opacity-70 mb-1">TODAY</p>
+                        <p class="text-lg font-bold segment-display eink-text" id="energyToday">3.45 kWh</p>
+                    </div>
+                    <div class="text-center eink-border rounded p-2 bg-white">
+                        <p class="text-xs eink-text opacity-70 mb-1">THIS WEEK</p>
+                        <p class="text-lg font-bold segment-display eink-text" id="energyWeek">18.2 kWh</p>
+                    </div>
+                    <div class="text-center eink-border rounded p-2 bg-white">
+                        <p class="text-xs eink-text opacity-70 mb-1">EFFICIENCY</p>
+                        <p class="text-lg font-bold segment-display eink-text" id="efficiency">87%</p>
+                    </div>
+                </div>
+
+                <!-- Peak Usage -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="eink-border rounded p-3 bg-white">
+                        <p class="text-xs eink-text opacity-70 mb-2">PEAK USAGE TIME</p>
+                        <p class="font-bold eink-text">12:00 PM - 2:00 PM</p>
+                        <p class="text-xs eink-text opacity-70 mt-1">Average: 4 ports active</p>
+                    </div>
+                    <div class="eink-border rounded p-3 bg-white">
+                        <p class="text-xs eink-text opacity-70 mb-2">SYSTEM STATUS</p>
+                        <p class="font-bold text-green-700 text-lg" id="systemStatus">ONLINE</p>
+                        <p class="text-xs eink-text opacity-70 mt-1">All systems operational</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- BOTTOM ROW -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            
-            <!-- MONTHLY COMPARISON -->
-            <div class="card p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-6">Monthly Energy Production</h3>
-                <div style="position: relative; height: 280px;">
-                    <canvas id="monthlyChart"></canvas>
+        <!-- MANUAL CRANK CONTROL -->
+        <div class="bg-white rounded-3xl shadow-xl p-8 mb-8 border-2 border border-black">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800">Manual Crank Generator</h3>
+                    <p class="text-gray-600">Activate emergency power generation</p>
+                </div>
+                <button id="crankToggle" class="px-8 py-4 bg-gradient-to-br from-stone-600 to-stone-700 text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                    <i class="fas fa-cog mr-2"></i> ACTIVATE CRANK
+                </button>
+            </div>
+            <div id="crankStatus" class="text-center py-4 hidden">
+                <i class="fas fa-cog fa-spin text-6xl text-orange-500 mb-3"></i>
+                <p class="text-xl font-bold text-orange-700">CRANKING IN PROGRESS...</p>
+                <p class="text-sm text-gray-600 mt-2">Generating <span id="crankOutput">45W</span> of emergency power</p>
+            </div>
+        </div>
+
+        <!-- ENVIRONMENTAL IMPACT -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-gradient-to-br from-stone-700 to-stone-800 rounded-2xl p-5 text-white shadow-lg">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-cloud text-2xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs opacity-80 mb-1">CO₂ Saved Today</p>
+                        <p class="text-2xl font-bold">2.45 <span class="text-sm font-normal">kg</span></p>
+                    </div>
                 </div>
             </div>
 
-            <!-- ENERGY BALANCE -->
-            <div class="card p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-6">Energy Balance</h3>
-                <div class="flex justify-center mb-6">
-                    <div style="position: relative; width: 250px; height: 250px;">
-                        <canvas id="energyBalanceChart"></canvas>
+            <div class="bg-gradient-to-br from-yellow-800 to-yellow-900 rounded-2xl p-5 text-white shadow-lg">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-tree text-2xl"></i>
                     </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="text-center p-4 bg-green-50 rounded-xl border border-green-200">
-                        <p class="text-3xl font-bold text-green-600"><?php echo number_format($systemData['total_generated_today']); ?></p>
-                        <p class="text-xs text-gray-600 mt-2 font-semibold">Generated (Wh)</p>
-                    </div>
-                    <div class="text-center p-4 bg-yellow-50 rounded-xl border border-yellow-200">
-                        <p class="text-3xl font-bold text-yellow-600"><?php echo number_format($systemData['total_consumed_today']); ?></p>
-                        <p class="text-xs text-gray-600 mt-2 font-semibold">Consumed (Wh)</p>
+                    <div>
+                        <p class="text-xs opacity-80 mb-1">Trees Equivalent</p>
+                        <p class="text-2xl font-bold">0.11 <span class="text-sm font-normal">trees</span></p>
                     </div>
                 </div>
             </div>
 
+            <div class="bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl p-5 text-white shadow-lg">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-bolt text-2xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs opacity-80 mb-1">Total Generated</p>
+                        <p class="text-2xl font-bold">3.45 <span class="text-sm font-normal">kWh</span></p>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </main>
@@ -499,228 +523,110 @@ $treesEquivalent = 0.11;
 </div>
 
 <script>
-// PHP Data to JavaScript
-const phpData = <?php echo json_encode([
-    'currentWatts' => $systemData['current_watts'],
-    'batteryPercent' => $systemData['battery_percent'],
-    'hourlyData' => $hourlyData,
-    'monthlyData' => $monthlyData,
-    'totalGenerated' => $systemData['total_generated_today'],
-    'totalConsumed' => $systemData['total_consumed_today']
-]); ?>;
-
-// Chart.js Configuration - Clean, modern style
-Chart.defaults.color = '#6b7280';
-Chart.defaults.borderColor = '#e5e7eb';
-Chart.defaults.font.family = 'Inter';
-Chart.defaults.font.size = 12;
-
-// Power Generation Chart
-const powerCtx = document.getElementById('powerGenerationChart').getContext('2d');
-new Chart(powerCtx, {
-    type: 'line',
-    data: {
-        labels: phpData.hourlyData.map(d => d.hour + ':00'),
-        datasets: [{
-            label: 'Power (W)',
-            data: phpData.hourlyData.map(d => d.power),
-            borderColor: '#22c55e',
-            backgroundColor: 'rgba(34, 197, 94, 0.15)',
-            borderWidth: 3,
-            tension: 0.4,
-            fill: true,
-            pointRadius: 0,
-            pointHoverRadius: 8,
-            pointHoverBackgroundColor: '#22c55e',
-            pointHoverBorderColor: '#fff',
-            pointHoverBorderWidth: 2
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        aspectRatio: 2.5,
-        plugins: {
-            legend: { display: false },
-            tooltip: {
-                backgroundColor: 'white',
-                titleColor: '#1f2937',
-                bodyColor: '#6b7280',
-                borderColor: '#e5e7eb',
-                borderWidth: 1,
-                padding: 12,
-                displayColors: false
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                max: 200,
-                grid: { color: '#f3f4f6', drawBorder: false },
-                ticks: { 
-                    color: '#6b7280', 
-                    padding: 8,
-                    stepSize: 50
-                }
-            },
-            x: {
-                grid: { display: false, drawBorder: false },
-                ticks: { 
-                    color: '#6b7280', 
-                    padding: 8,
-                    maxRotation: 0,
-                    autoSkip: true,
-                    maxTicksLimit: 12
-                }
-            }
-        }
-    }
-});
-
-// Monthly Comparison Chart
-const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
-new Chart(monthlyCtx, {
-    type: 'bar',
-    data: {
-        labels: phpData.monthlyData.map(d => d.month),
-        datasets: [{
-            label: 'Solar (Wh)',
-            data: phpData.monthlyData.map(d => d.solar),
-            backgroundColor: '#22c55e',
-            borderRadius: 8,
-            borderSkipped: false
-        }, {
-            label: 'Manual (Wh)',
-            data: phpData.monthlyData.map(d => d.manual),
-            backgroundColor: '#fbbf24',
-            borderRadius: 8,
-            borderSkipped: false
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        aspectRatio: 2,
-        plugins: {
-            legend: {
-                display: true,
-                position: 'top',
-                labels: {
-                    usePointStyle: true,
-                    padding: 20,
-                    font: { weight: '600' }
-                }
-            },
-            tooltip: {
-                backgroundColor: 'white',
-                titleColor: '#1f2937',
-                bodyColor: '#6b7280',
-                borderColor: '#e5e7eb',
-                borderWidth: 1,
-                padding: 12
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                grid: { color: '#f3f4f6', drawBorder: false },
-                ticks: { color: '#6b7280', padding: 8 }
-            },
-            x: {
-                grid: { display: false, drawBorder: false },
-                ticks: { color: '#6b7280', padding: 8 }
-            }
-        }
-    }
-});
-
-// Energy Balance Donut Chart
-const balanceCtx = document.getElementById('energyBalanceChart').getContext('2d');
-new Chart(balanceCtx, {
-    type: 'doughnut',
-    data: {
-        labels: ['Generated', 'Consumed', 'Stored'],
-        datasets: [{
-            data: [phpData.totalGenerated, phpData.totalConsumed, phpData.totalGenerated - phpData.totalConsumed],
-            backgroundColor: ['#22c55e', '#fbbf24', '#3b82f6'],
-            borderWidth: 0,
-            hoverOffset: 8
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-            legend: {
-                display: true,
-                position: 'bottom',
-                labels: {
-                    usePointStyle: true,
-                    padding: 15,
-                    font: { weight: '600' }
-                }
-            },
-            tooltip: {
-                backgroundColor: 'white',
-                titleColor: '#1f2937',
-                bodyColor: '#6b7280',
-                borderColor: '#e5e7eb',
-                borderWidth: 1,
-                padding: 12
-            }
-        }
-    }
-});
-
-// Real-time updates simulation with smooth transitions
-setInterval(() => {
-    const currentPower = document.getElementById('currentPower');
-    let value = parseFloat(currentPower.textContent);
-    value += (Math.random() - 0.5) * 10;
-    value = Math.max(50, Math.min(200, value));
-    currentPower.textContent = value.toFixed(1);
-}, 2000);
-
-// Simulate manual crank activation with visual effects
-setInterval(() => {
-    if (Math.random() > 0.95) {
-        activateCrank();
-        setTimeout(deactivateCrank, 3000);
-    }
-}, 5000);
-
-function activateCrank() {
-    const card = document.getElementById('crankCard');
-    const icon = document.getElementById('crankIcon');
-    const status = document.getElementById('crankStatus');
-    const power = document.getElementById('crankPower');
+// Simulate real-time data updates
+function updateDashboard() {
+    // Battery simulation
+    const currentBattery = parseInt(document.getElementById('batteryPercent').textContent);
+    const newBattery = Math.min(100, Math.max(0, currentBattery + (Math.random() * 4 - 1)));
+    document.getElementById('batteryPercent').textContent = Math.round(newBattery) + '%';
+    document.getElementById('batteryBar').style.width = Math.round(newBattery) + '%';
     
-    card.classList.add('glow-yellow');
-    icon.innerHTML = '<i class="fas fa-cog text-white text-5xl fa-spin"></i>';
-    icon.classList.add('shadow-2xl');
-    status.textContent = '⚡ CRANKING';
-    status.className = 'inline-block px-5 py-2 gradient-yellow text-white rounded-full text-sm font-bold shadow-md animate-pulse';
-    power.textContent = '45.8 W';
-    power.classList.add('text-yellow-600');
+    // Low battery warning
+    const warningDiv = document.getElementById('lowBatteryWarning');
+    if (newBattery < 20) {
+        warningDiv.classList.remove('hidden');
+    } else {
+        warningDiv.classList.add('hidden');
+    }
+    
+    // Voltage simulation
+    const voltage = (12.0 + Math.random() * 0.8).toFixed(1);
+    document.getElementById('voltage').textContent = voltage + 'V';
+    
+    // Charge/discharge rate simulation
+    const isCharging = Math.random() > 0.3;
+    const rate = (Math.random() * 3).toFixed(1);
+    document.getElementById('chargeRate').textContent = (isCharging ? '+' : '-') + rate + 'A';
+    document.getElementById('batteryStatusText').textContent = isCharging ? 'Charging' : 'Discharging';
+    
+    // Runtime estimation
+    const runtime = (4 + Math.random() * 4).toFixed(1);
+    document.getElementById('runtime').textContent = runtime + 'h';
+    
+    // Solar power simulation
+    const solarPower = (100 + Math.random() * 50).toFixed(1);
+    document.getElementById('solarPower').textContent = solarPower + 'W';
+    
+    // Total incoming watts
+    const crankPower = parseFloat(document.getElementById('crankPower').textContent);
+    const totalWatts = (parseFloat(solarPower) + crankPower).toFixed(1);
+    document.getElementById('totalWatts').textContent = totalWatts + 'W';
+    
+    // Energy balance
+    const consumption = 50 + Math.random() * 30; // Simulated consumption
+    const balance = parseFloat(totalWatts) - consumption;
+    const balancePercent = Math.min(100, Math.max(0, ((parseFloat(totalWatts) / 200) * 100)));
+    document.getElementById('energyBalance').style.width = balancePercent + '%';
+    document.getElementById('balanceText').textContent = balance > 0 ? 
+        `Charging (+${balance.toFixed(0)}W)` : 
+        `Discharging (${balance.toFixed(0)}W)`;
 }
 
-function deactivateCrank() {
-    const card = document.getElementById('crankCard');
-    const icon = document.getElementById('crankIcon');
-    const status = document.getElementById('crankStatus');
-    const power = document.getElementById('crankPower');
-    
-    card.classList.remove('glow-yellow');
-    icon.innerHTML = '<i class="fas fa-cog text-white text-5xl"></i>';
-    icon.classList.remove('shadow-2xl');
-    status.textContent = 'Active';
-    status.className = 'inline-block px-5 py-2 gradient-green text-white rounded-full text-sm font-bold shadow-md';
-    power.textContent = '13.2 W';
-    power.classList.remove('text-yellow-600');
-}
+// Manual crank activation
+let crankActive = false;
+let crankInterval;
 
-console.log('🌱 EcoBench Dashboard Initialized Successfully!');
-console.log('📊 Mock Data Loaded:', phpData);
+document.getElementById('crankToggle').addEventListener('click', function() {
+    crankActive = !crankActive;
+    const crankSource = document.getElementById('crankSource');
+    const crankPower = document.getElementById('crankPower');
+    const crankStatus = document.getElementById('crankStatus');
+    const crankStatusText = document.getElementById('crankStatusText');
+    const button = this;
+    
+    if (crankActive) {
+        crankSource.classList.add('active');
+        crankStatusText.textContent = 'Active';
+        crankStatus.classList.remove('hidden');
+        button.innerHTML = '<i class="fas fa-stop mr-2"></i> STOP CRANK';
+        
+        // Simulate cranking
+        crankInterval = setInterval(() => {
+            if (!crankActive) {
+                clearInterval(crankInterval);
+                return;
+            }
+            const power = (40 + Math.random() * 15).toFixed(1);
+            crankPower.textContent = power + 'W';
+            crankPower.classList.add('text-green-700');
+            document.getElementById('crankOutput').textContent = power + 'W';
+        }, 500);
+    } else {
+        crankSource.classList.remove('active');
+        crankPower.textContent = '0.0W';
+        crankPower.classList.remove('text-green-700');
+        crankStatusText.textContent = 'Standby';
+        crankStatus.classList.add('hidden');
+        button.innerHTML = '<i class="fas fa-cog mr-2"></i> ACTIVATE CRANK';
+        clearInterval(crankInterval);
+    }
+});
+
+// Update dashboard every 3 seconds
+setInterval(updateDashboard, 3000);
+
+// Simulate port status changes
+setInterval(() => {
+    const ports = document.querySelectorAll('.port-indicator');
+    if (Math.random() > 0.7) {
+        ports.forEach(port => {
+            if (Math.random() > 0.5) {
+                port.classList.toggle('charging');
+                port.classList.toggle('available');
+            }
+        });
+    }
+}, 10000);
 </script>
 
 </body>
