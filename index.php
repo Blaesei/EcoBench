@@ -13,9 +13,9 @@ $nav_items = [
 
 // Slideshow images (add your image paths here)
 $slideshow_images = [
-    ['src' => 'images/slide1.jpg', 'alt' => 'EcoBench in campus environment'],
-    ['src' => 'images/slide2.jpg', 'alt' => 'Solar-powered charging station'],
-    ['src' => 'images/slide3.jpg', 'alt' => 'Students using EcoBench']
+    ['src' => 'img/slide1.png', 'alt' => 'EcoBench in campus environment'],
+    ['src' => 'img/slide2.png', 'alt' => 'Solar-powered charging station'],
+    ['src' => 'img/slide3.png', 'alt' => 'Students using EcoBench']
 ];
 
 // Features data
@@ -23,23 +23,43 @@ $features = [
     [
         'icon' => '🌱',
         'title' => 'Eco-Friendly',
-        'description' => 'Powered by renewable solar energy'
+        'description' => 'Harnesses renewable solar energy to reduce environmental impact.',
+        'color' => 'green',
+        'stat' => '100%',
+        'stat_label' => 'Renewable'
     ],
     [
         'icon' => '🔋',
         'title' => 'Smart Charging',
-        'description' => 'USB ports for device charging'
+        'description' => 'Provides reliable USB charging for mobile devices on campus.',
+        'color' => 'blue',
+        'stat' => '5V',
+        'stat_label' => 'USB Output'
     ],
     [
         'icon' => '📊',
         'title' => 'Energy Monitoring',
-        'description' => 'Real-time energy consumption tracking'
+        'description' => 'Displays real-time power generation and energy usage data.',
+        'color' => 'yellow',
+        'stat' => '24/7',
+        'stat_label' => 'Tracking'
     ],
     [
         'icon' => '💺',
         'title' => 'Comfortable Seating',
-        'description' => 'Ergonomic design for student comfort'
+        'description' => 'Designed with ergonomic seating for student comfort and usability.',
+        'color' => 'purple',
+        'stat' => '4+',
+        'stat_label' => 'Seats'
     ]
+];
+
+
+// Impact metrics
+$impact_items = [
+    ['icon' => '🌍', 'title' => 'Carbon Neutral', 'description' => 'Zero emissions operation'],
+    ['icon' => '♻️', 'title' => 'Recycled Materials', 'description' => 'Sustainable construction'],
+    ['icon' => '💡', 'title' => 'Smart Sensors', 'description' => 'Intelligent power management']
 ];
 ?>
 <!DOCTYPE html>
@@ -57,7 +77,7 @@ $features = [
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Stylesheet -->
     <link rel="stylesheet" href="styles.css">
@@ -67,6 +87,13 @@ $features = [
 </head>
 
 <body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="bg-shape shape-1"></div>
+        <div class="bg-shape shape-2"></div>
+        <div class="bg-shape shape-3"></div>
+    </div>
+
     <!-- Scroll Progress Bar -->
     <div class="scroll-progress" id="scrollProgress"></div>
 
@@ -107,19 +134,38 @@ $features = [
             <?php endforeach; ?>
         </div>
 
+        <!-- Floating particles -->
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+
         <div class="hero-content">
-            <div class="hero-badge">Sustainable Innovation</div>
-            <h1 class="hero-title">
-                <span class="eco">Eco</span><span class="bench">Bench</span>
-            </h1>
+            <div class="hero-badge">
+                <span class="badge-pulse"></span>
+                Sustainable Innovation
+            </div>
+            <div class="hero-logo-wrapper">
+                <img src="img/EcoBench Logo.png" alt="EcoBench" class="hero-logo">
+            </div>
             <p class="hero-description">
                 A sustainable smart bench that combines renewable-powered device charging, seating,
                 and real-time energy monitoring for the use of Polytechnic University of the Philippines —
                 Institute of Technology.
             </p>
             <div class="hero-buttons">
-                <a href="faqs.php" class="btn btn-primary">Learn More</a>
-                <a href="contact.php" class="btn btn-secondary">Get in Touch</a>
+                <a href="faqs.php" class="btn btn-primary">
+                    <span>Learn More</span>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M4 10H16M16 10L10 4M16 10L10 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </a>
+                <a href="contact.php" class="btn btn-secondary">
+                    <span>Get in Touch</span>
+                </a>
             </div>
 
             <!-- Slideshow Controls -->
@@ -142,43 +188,67 @@ $features = [
 
     <!-- Features Section -->
     <section class="features" id="features">
+        <div class="features-bg-decoration">
+            <div class="features-circle features-circle-1"></div>
+            <div class="features-circle features-circle-2"></div>
+            <div class="features-circle features-circle-3"></div>
+        </div>
+        
         <div class="container">
             <div class="section-header">
+                <span class="section-label">What We Offer</span>
                 <h2>Key Features</h2>
                 <p>Combining sustainability with smart technology</p>
             </div>
 
             <div class="features-grid">
-                <?php foreach ($features as $feature): ?>
-                    <div class="feature-card">
-                        <div class="feature-icon"><?php echo $feature['icon']; ?></div>
-                        <h3><?php echo $feature['title']; ?></h3>
-                        <p><?php echo $feature['description']; ?></p>
+                <?php foreach ($features as $index => $feature): ?>
+                    <div class="feature-card" data-color="<?php echo $feature['color']; ?>" style="--delay: <?php echo $index * 0.1; ?>s">
+                        <div class="feature-glow"></div>
+                        <div class="feature-number">0<?php echo $index + 1; ?></div>
+                        
+                        <div class="feature-icon-wrapper">
+                            <div class="feature-icon-bg"></div>
+                            <div class="feature-icon"><?php echo $feature['icon']; ?></div>
+                        </div>
+                        
+                        <div class="feature-content">
+                            <h3><?php echo $feature['title']; ?></h3>
+                            <p><?php echo $feature['description']; ?></p>
+                        </div>
+                        
+                        <div class="feature-stats">
+                            <div class="feature-stat-value"><?php echo $feature['stat']; ?></div>
+                            <div class="feature-stat-label"><?php echo $feature['stat_label']; ?></div>
+                        </div>
+                        
+                        <div class="feature-hover-line"></div>
                     </div>
                 <?php endforeach; ?>
             </div>
-        </div>
-    </section>
 
-    <!-- Stats Section -->
-    <section class="stats">
-        <div class="container">
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-number" data-target="100">0</div>
-                    <div class="stat-label">% Solar Powered</div>
+            <!-- Additional Feature Highlights -->
+            <div class="feature-highlights">
+                <div class="highlight-card">
+                    <div class="highlight-icon">⚡</div>
+                    <div class="highlight-text">
+                        <strong>Fast Charging</strong>
+                        <span>Quick power delivery</span>
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-number" data-target="500">0</div>
-                    <div class="stat-label">Charges Per Month</div>
+                <div class="highlight-card">
+                    <div class="highlight-icon">🔒</div>
+                    <div class="highlight-text">
+                        <strong>Secure Design</strong>
+                        <span>Anti-theft protection</span>
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-number" data-target="75">0</div>
-                    <div class="stat-label">kWh Energy Saved</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" data-target="95">0</div>
-                    <div class="stat-label">% Satisfaction Rate</div>
+                <div class="highlight-card">
+                    <div class="highlight-icon">🌤️</div>
+                    <div class="highlight-text">
+                        <strong>Weather Resistant</strong>
+                        <span>All-season durability</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -186,11 +256,64 @@ $features = [
 
     <!-- CTA Section -->
     <section class="cta-section">
+        <div class="cta-bg-pattern">
+            <div class="pattern-dot"></div>
+            <div class="pattern-dot"></div>
+            <div class="pattern-dot"></div>
+            <div class="pattern-dot"></div>
+            <div class="pattern-dot"></div>
+            <div class="pattern-dot"></div>
+        </div>
+        
+        <div class="cta-shape cta-shape-1"></div>
+        <div class="cta-shape cta-shape-2"></div>
+        
         <div class="container">
             <div class="cta-content">
-                <h2>Want to See More?</h2>
-                <p>Sign in to access our interactive dashboard and prototype showcase</p>
-                <a href="signin.php" class="btn btn-primary btn-large">Sign In Now</a>
+                <div class="cta-icon-wrapper">
+                    <div class="cta-icon-circle"></div>
+                    <div class="cta-icon">🚀</div>
+                </div>
+                
+                <div class="cta-badge">Get Started</div>
+                <h2>Ready to Experience the Future?</h2>
+                <p>Sign in to access our interactive dashboard, explore the prototype showcase, and discover how EcoBench is revolutionizing sustainable campus technology</p>
+                
+                <div class="cta-features-mini">
+                    <div class="cta-mini-item">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M7 10L9 12L13 8M19 10C19 14.9706 14.9706 19 10 19C5.02944 19 1 14.9706 1 10C1 5.02944 5.02944 1 10 1C14.9706 1 19 5.02944 19 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <span>Real-time Monitoring</span>
+                    </div>
+                    <div class="cta-mini-item">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M7 10L9 12L13 8M19 10C19 14.9706 14.9706 19 10 19C5.02944 19 1 14.9706 1 10C1 5.02944 5.02944 1 10 1C14.9706 1 19 5.02944 19 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <span>Interactive Dashboard</span>
+                    </div>
+                    <div class="cta-mini-item">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M7 10L9 12L13 8M19 10C19 14.9706 14.9706 19 10 19C5.02944 19 1 14.9706 1 10C1 5.02944 5.02944 1 10 1C14.9706 1 19 5.02944 19 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <span>Prototype Access</span>
+                    </div>
+                </div>
+                
+                <a href="signin.php" class="btn btn-primary btn-large cta-btn">
+                    <span>Sign In Now</span>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M4 10H16M16 10L10 4M16 10L10 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </a>
+                
+                <div class="cta-note">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14Z" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M8 5V8L10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    No credit card required • Instant access
+                </div>
             </div>
         </div>
     </section>
@@ -201,15 +324,21 @@ $features = [
             <div class="footer-content">
                 <div class="footer-brand">
                     <div class="logo">
-                        <svg class="logo-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                            <path class="leaf1" d="M20,60 Q20,20 50,20 Q45,40 50,60 Z" />
-                            <path class="leaf2" d="M50,60 Q80,30 75,10 Q60,30 50,60 Z" />
-                        </svg>
-                        <span class="logo-text">
-                            <span class="eco">eco</span><span class="bench">bench</span>
-                        </span>
+                        <img class="logo-icon" src="img/EcoBench Logo.png" alt="EcoBench Logo">
                     </div>
-                    <p>Powering a sustainable future, one bench at a time.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" />
+                            </svg></a>
+                        <a href="#" aria-label="Twitter"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z" />
+                            </svg></a>
+                        <a href="#" aria-label="Instagram"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                                <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" fill="none" stroke="#000" stroke-width="2" />
+                                <circle cx="17.5" cy="6.5" r="1.5" fill="#000" />
+                            </svg></a>
+                    </div>
                 </div>
 
                 <div class="footer-links">
@@ -218,7 +347,7 @@ $features = [
                         <ul>
                             <li><a href="index.php">Home</a></li>
                             <li><a href="faqs.php">FAQs</a></li>
-                            <li><a href="bout.php">About Us</a></li>
+                            <li><a href="about.php">About Us</a></li>
                             <li><a href="contact.php">Contact</a></li>
                         </ul>
                     </div>
