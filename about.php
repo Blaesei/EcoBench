@@ -1217,7 +1217,7 @@ $core_values = [
                         <?php foreach ($nav_items as $name => $link): ?>
                             <li><a href="<?php echo $link; ?>" class="nav-link <?php echo ($name === 'About Us') ? 'active' : ''; ?>"><?php echo $name; ?></a></li>
                         <?php endforeach; ?>
-                        <li><a href="signin.php" class="nav-link sign-in-btn">Sign in</a></li>
+                        <li><a href="signin.php" class="nav-link sign-in-btn">Logout</a></li>
                     </ul>
                 </nav>
 

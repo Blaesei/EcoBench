@@ -892,7 +892,7 @@ include("auth.php");
                         <li><a href="faqs.php" class="nav-link active">FAQs</a></li>
                         <li><a href="about.php" class="nav-link">About Us</a></li>
                         <li><a href="contact.php" class="nav-link">Contact</a></li>
-                        <li><a href="signin.php" class="nav-link sign-in-btn">Sign in</a></li>
+                        <li><a href="signin.php" class="nav-link sign-in-btn">Logout</a></li>
                     </ul>
                 </nav>
 
