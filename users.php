@@ -1,85 +1,97 @@
 <?php
+require('db.php');
 session_start();
-// Protect the page - redirect to signin if not logged in
+
+// Protect the page
 if (!isset($_SESSION['username'])) {
     header('Location: signin.php');
     exit();
 }
 
-// Database connection
-$host = 'localhost';
-$dbname = 'ecobench';
-$username = 'root';
-$password = '@April192005';
-
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch(PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
+// Only admin can access this page
+if (strtolower($_SESSION['username']) !== 'admin') {
+    header('Location: index.php');
+    exit();
 }
 
-// Handle Delete User
-if (isset($_GET['delete'])) {
-    $userId = $_GET['delete'];
-    try {
-        $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
-        $stmt->execute([$userId]);
-        $_SESSION['success_message'] = "User deleted successfully!";
-        header('Location: users.php');
-        exit();
-    } catch(PDOException $e) {
-        $_SESSION['error_message'] = "Error deleting user: " . $e->getMessage();
+// Handle Add New User
+if (isset($_POST['add_user'])) {
+    $newUsername = trim($_POST['username'] ?? '');
+    $newEmail = trim($_POST['email'] ?? '');
+    $newPassword = trim($_POST['password'] ?? '');
+    $confirmPassword = trim($_POST['confirm_password'] ?? '');
+
+    $errors = [];
+
+    if (empty($newUsername)) {
+        $errors[] = "Username is required.";
     }
-}
-
-// Handle Edit User
-if (isset($_POST['edit_user'])) {
-    $userId = $_POST['user_id'];
-    $newUsername = trim($_POST['username']);
-    $newEmail = trim($_POST['email']);
-    
-    try {
-        $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ? WHERE id = ?");
-        $stmt->execute([$newUsername, $newEmail, $userId]);
-        $_SESSION['success_message'] = "User updated successfully!";
-        header('Location: users.php');
-        exit();
-    } catch(PDOException $e) {
-        $_SESSION['error_message'] = "Error updating user: " . $e->getMessage();
+    if (strtolower($newUsername) === 'admin') {
+        $errors[] = "Cannot create another admin account.";
     }
-}
+    if (empty($newEmail) || !filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "Valid email is required.";
+    }
+    if (empty($newPassword)) {
+        $errors[] = "Password is required.";
+    }
+    if ($newPassword !== $confirmPassword) {
+        $errors[] = "Passwords do not match.";
+    }
 
-// Handle Change Password
-if (isset($_POST['change_password'])) {
-    $userId = $_POST['user_id'];
-    $newPassword = $_POST['new_password'];
-    $confirmPassword = $_POST['confirm_password'];
-    
-    if ($newPassword === $confirmPassword) {
-        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-        try {
-            $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
-            $stmt->execute([$hashedPassword, $userId]);
-            $_SESSION['success_message'] = "Password changed successfully!";
-            header('Location: users.php');
-            exit();
-        } catch(PDOException $e) {
-            $_SESSION['error_message'] = "Error changing password: " . $e->getMessage();
+    if (empty($errors)) {
+        // Check duplicate username
+        $check_stmt = $con->prepare("SELECT id FROM users WHERE username = ?");
+        $check_stmt->bind_param("s", $newUsername);
+        $check_stmt->execute();
+        if ($check_stmt->get_result()->num_rows > 0) {
+            $errors[] = "Username already taken.";
         }
-    } else {
-        $_SESSION['error_message'] = "Passwords do not match!";
+        $check_stmt->close();
     }
+
+    if (empty($errors)) {
+        $hashedPassword = md5($newPassword);
+        $trn_date = date("Y-m-d H:i:s");
+
+        $insert_stmt = $con->prepare("INSERT INTO users (username, email, password, trn_date) VALUES (?, ?, ?, ?)");
+        $insert_stmt->bind_param("ssss", $newUsername, $newEmail, $hashedPassword, $trn_date);
+
+        if ($insert_stmt->execute()) {
+            $_SESSION['success_message'] = "New user added successfully!";
+        } else {
+            $_SESSION['error_message'] = "Failed to add user.";
+        }
+        $insert_stmt->close();
+    } else {
+        $_SESSION['error_message'] = implode("<br>", $errors);
+    }
+    header('Location: users.php');
+    exit();
+}
+
+// Handle Delete
+if (isset($_GET['delete'])) {
+    $userId = (int)$_GET['delete'];
+
+    if ($userId == 1) {
+        $_SESSION['error_message'] = "Cannot delete the admin account!";
+    } else {
+        $delete_query = "DELETE FROM users WHERE id = $userId";
+        if (mysqli_query($con, $delete_query)) {
+            $_SESSION['success_message'] = "User deleted successfully!";
+        } else {
+            $_SESSION['error_message'] = "Error deleting user.";
+        }
+    }
+    header('Location: users.php');
+    exit();
 }
 
 // Fetch all users
-try {
-    $stmt = $pdo->query("SELECT id, username, email, created_at FROM users ORDER BY id DESC");
-    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch(PDOException $e) {
-    $users = [];
-    $_SESSION['error_message'] = "Error fetching users: " . $e->getMessage();
-}
+$sel_query = "SELECT id, username, email, trn_date FROM users ORDER BY id DESC";
+$result = mysqli_query($con, $sel_query) or die(mysqli_error($con));
+$user_count = mysqli_num_rows($result);
 ?>
 
 <!DOCTYPE html>
@@ -96,7 +108,6 @@ try {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard.css">
-    <link rel="stylesheet" href="users.css">
 
     <script>
         tailwind.config = {
@@ -110,6 +121,40 @@ try {
             }
         }
     </script>
+
+    <style>
+        /* Modal Styles - Simplified (no logo/badge) */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            width: 460px;
+            max-width: 95%;
+            text-align: center;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+        }
+        .modal-close:hover {
+            color: #333;
+        }
+    </style>
 </head>
 
 <body class="text-gray-800">
@@ -119,7 +164,6 @@ try {
         <!-- SIDEBAR -->
         <aside class="sidebar w-64 fixed h-full left-0 top-0 z-50 hidden lg:block">
             <div class="p-6 flex flex-col h-full">
-                <!-- Logo Section -->
                 <div class="logo-container mb-8">
                     <div class="logo-wrapper">
                         <img src="img/EcoBench Logo.png" alt="EcoBench Logo" class="ecobench-logo">
@@ -149,7 +193,6 @@ try {
                     <a href="logout.php" class="nav-item logout flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
                         <i class="fas fa-sign-out-alt w-5"></i>
                         <span>Logout</span>
-                        <i class="fas fa-arrow-right ml-auto logout-arrow"></i>
                     </a>
                 </div>
             </div>
@@ -158,221 +201,132 @@ try {
         <!-- MAIN CONTENT -->
         <main class="flex-1 lg:ml-64 p-6 md:p-8">
 
-            <!-- HEADER -->
-            <div class="mb-8 header-section">
+            <!-- HEADER with Add Button -->
+            <div class="mb-8">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h1 class="text-4xl font-bold gradient-text mb-2">User Management</h1>
-                        <p class="text-gray-600 text-sm font-medium">Manage system users and permissions</p>
+                        <h1 class="text-4xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent mb-2">User Management</h1>
+                        <p class="text-gray-600 text-sm font-medium">View and manage registered users</p>
                     </div>
-                    <div class="user-count-badge">
-                        <i class="fas fa-users"></i>
-                        <span><?php echo count($users); ?> Users</span>
+                    <div class="flex items-center gap-4">
+                        <div class="bg-green-100 text-green-800 px-4 py-2 rounded-full font-bold">
+                            <i class="fas fa-users mr-2"></i>
+                            <?php echo $user_count; ?> Users
+                        </div>
+                        <button onclick="document.getElementById('addModal').classList.remove('hidden')" 
+                                class="bg-gradient-to-r from-green-600 to-green-700 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition">
+                            <i class="fas fa-user-plus mr-2"></i> Add New User
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- SUCCESS/ERROR MESSAGES -->
+            <!-- Messages -->
             <?php if (isset($_SESSION['success_message'])): ?>
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i>
-                    <span><?php echo $_SESSION['success_message']; ?></span>
-                    <button onclick="this.parentElement.remove()" class="alert-close">
-                        <i class="fas fa-times"></i>
-                    </button>
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+                    <?php echo $_SESSION['success_message']; unset($_SESSION['success_message']); ?>
                 </div>
-                <?php unset($_SESSION['success_message']); ?>
             <?php endif; ?>
 
             <?php if (isset($_SESSION['error_message'])): ?>
-                <div class="alert alert-error">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span><?php echo $_SESSION['error_message']; ?></span>
-                    <button onclick="this.parentElement.remove()" class="alert-close">
-                        <i class="fas fa-times"></i>
-                    </button>
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                    <?php echo $_SESSION['error_message']; unset($_SESSION['error_message']); ?>
                 </div>
-                <?php unset($_SESSION['error_message']); ?>
             <?php endif; ?>
 
-            <!-- USERS TABLE -->
-            <div class="table-container">
-                <div class="table-header">
-                    <h2 class="table-title">
-                        <i class="fas fa-table"></i>
-                        Registered Users
-                    </h2>
+            <!-- TABLE -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-4">
+                    <h2 class="text-xl font-bold">Registered Users</h2>
                 </div>
-
-                <div class="table-responsive">
-                    <table class="users-table">
-                        <thead>
+                <table class="w-full border-collapse">
+                    <thead class="bg-green-50 text-green-800">
+                        <tr>
+                            <th class="px-6 py-4 text-left">User ID</th>
+                            <th class="px-6 py-4 text-left">Username</th>
+                            <th class="px-6 py-4 text-left">Email</th>
+                            <th class="px-6 py-4 text-left">Registered Date</th>
+                            <th class="px-6 py-4 text-center">Edit</th>
+                            <th class="px-6 py-4 text-center">Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <?php if (mysqli_num_rows($result) == 0): ?>
                             <tr>
-                                <th>User ID</th>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Created At</th>
-                                <th>Actions</th>
+                                <td colspan="6" class="text-center py-12 text-gray-500">
+                                    <i class="fas fa-users-slash text-4xl mb-4 block"></i>
+                                    No users found
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (empty($users)): ?>
-                                <tr>
-                                    <td colspan="5" class="text-center">
-                                        <div class="empty-state">
-                                            <i class="fas fa-users-slash"></i>
-                                            <p>No users found</p>
-                                        </div>
+                        <?php else: ?>
+                            <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                                <tr class="hover:bg-gray-50 transition">
+                                    <td class="px-6 py-4 font-medium">#<?php echo $row['id']; ?></td>
+                                    <td class="px-6 py-4"><?php echo htmlspecialchars($row['username']); ?></td>
+                                    <td class="px-6 py-4"><?php echo htmlspecialchars($row['email']); ?></td>
+                                    <td class="px-6 py-4"><?php echo date('M d, Y h:i A', strtotime($row['trn_date'])); ?></td>
+                                    <td class="px-6 py-4 text-center">
+                                        <?php if ($row['id'] != 1): ?>
+                                            <a href="edit_user.php?id=<?php echo $row['id']; ?>" class="text-blue-600 hover:text-blue-800 font-medium">
+                                                Edit
+                                            </a>
+                                        <?php else: ?>
+                                            <span class="text-gray-400">-</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <?php if ($row['id'] != 1): ?>
+                                            <a href="users.php?delete=<?php echo $row['id']; ?>" 
+                                               onclick="return confirm('Are you sure you want to delete this user?')"
+                                               class="text-red-600 hover:text-red-800 font-medium">
+                                                Delete
+                                            </a>
+                                        <?php else: ?>
+                                            <span class="text-gray-400">-</span>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
-                            <?php else: ?>
-                                <?php foreach ($users as $user): ?>
-                                    <tr>
-                                        <td>
-                                            <span class="user-id-badge">#<?php echo htmlspecialchars($user['id']); ?></span>
-                                        </td>
-                                        <td>
-                                            <div class="user-info">
-                                                <i class="fas fa-user-circle"></i>
-                                                <span><?php echo htmlspecialchars($user['username']); ?></span>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="email-info">
-                                                <i class="fas fa-envelope"></i>
-                                                <span><?php echo htmlspecialchars($user['email']); ?></span>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="date-badge">
-                                                <i class="fas fa-calendar-alt"></i>
-                                                <?php echo date('M d, Y', strtotime($user['created_at'])); ?>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button onclick="openEditModal(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($user['email'], ENT_QUOTES); ?>')" 
-                                                        class="btn-edit" title="Edit User">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button onclick="openPasswordModal(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>')" 
-                                                        class="btn-password" title="Change Password">
-                                                    <i class="fas fa-key"></i>
-                                                </button>
-                                                <button onclick="confirmDelete(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>')" 
-                                                        class="btn-delete" title="Delete User">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
+                            <?php endwhile; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
 
         </main>
 
     </div>
 
-    <!-- EDIT USER MODAL -->
-    <div id="editModal" class="modal">
+    <!-- ADD USER MODAL - Simplified (no logo, no badge) -->
+    <div id="addModal" class="hidden modal-overlay">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-edit"></i> Edit User</h3>
-                <button onclick="closeEditModal()" class="modal-close">
-                    <i class="fas fa-times"></i>
+            <span class="modal-close" onclick="document.getElementById('addModal').classList.add('hidden')">&times;</span>
+            
+            <h2 class="text-3xl font-bold text-green-800 mb-10">Add New User</h2>
+
+            <form action="users.php" method="POST">
+                <div class="text-left mb-6">
+                    <label class="block text-gray-700 font-semibold mb-2">Username</label>
+                    <input type="text" name="username" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-green-600" required>
+                </div>
+                <div class="text-left mb-6">
+                    <label class="block text-gray-700 font-semibold mb-2">Email</label>
+                    <input type="email" name="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-green-600" required>
+                </div>
+                <div class="text-left mb-6">
+                    <label class="block text-gray-700 font-semibold mb-2">Password</label>
+                    <input type="password" name="password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-green-600" required>
+                </div>
+                <div class="text-left mb-8">
+                    <label class="block text-gray-700 font-semibold mb-2">Confirm Password</label>
+                    <input type="password" name="confirm_password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-green-600" required>
+                </div>
+
+                <button type="submit" name="add_user" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-full transition">
+                    Add User
                 </button>
-            </div>
-            <form method="POST" action="users.php">
-                <input type="hidden" name="user_id" id="edit_user_id">
-                <div class="form-group">
-                    <label for="edit_username">
-                        <i class="fas fa-user"></i> Username
-                    </label>
-                    <input type="text" name="username" id="edit_username" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit_email">
-                        <i class="fas fa-envelope"></i> Email
-                    </label>
-                    <input type="email" name="email" id="edit_email" required>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" onclick="closeEditModal()" class="btn-cancel">Cancel</button>
-                    <button type="submit" name="edit_user" class="btn-save">
-                        <i class="fas fa-save"></i> Save Changes
-                    </button>
-                </div>
             </form>
         </div>
     </div>
-
-    <!-- CHANGE PASSWORD MODAL -->
-    <div id="passwordModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-key"></i> Change Password</h3>
-                <button onclick="closePasswordModal()" class="modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form method="POST" action="users.php">
-                <input type="hidden" name="user_id" id="password_user_id">
-                <div class="form-group">
-                    <label>
-                        <i class="fas fa-user"></i> Username
-                    </label>
-                    <input type="text" id="password_username" disabled>
-                </div>
-                <div class="form-group">
-                    <label for="new_password">
-                        <i class="fas fa-lock"></i> New Password
-                    </label>
-                    <input type="password" name="new_password" id="new_password" required minlength="6">
-                </div>
-                <div class="form-group">
-                    <label for="confirm_password">
-                        <i class="fas fa-lock"></i> Confirm Password
-                    </label>
-                    <input type="password" name="confirm_password" id="confirm_password" required minlength="6">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" onclick="closePasswordModal()" class="btn-cancel">Cancel</button>
-                    <button type="submit" name="change_password" class="btn-save">
-                        <i class="fas fa-key"></i> Change Password
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- DELETE CONFIRMATION MODAL -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content modal-danger">
-            <div class="modal-header">
-                <h3><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h3>
-                <button onclick="closeDeleteModal()" class="modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete user <strong id="delete_username"></strong>?</p>
-                <p class="text-warning">This action cannot be undone!</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" onclick="closeDeleteModal()" class="btn-cancel">Cancel</button>
-                <a id="confirmDeleteBtn" href="#" class="btn-delete-confirm">
-                    <i class="fas fa-trash"></i> Delete User
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <script src="users.js"></script>
 
 </body>
-
 </html>
