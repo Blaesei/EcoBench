@@ -1,6 +1,6 @@
 <?php
-// signin.php - Updated to match your ORIGINAL login logic EXACTLY (login with username ONLY + MD5)
-require('db.php'); // Your database connection file
+// signin.php - Updated: Admin vs Normal user redirect + login with username only
+require('db.php');
 session_start();
 
 $errors = [];
@@ -18,7 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        // Exact same as your original code: MD5 hash + query by username only
         $hashed_password = md5($password);
 
         $stmt = $con->prepare("SELECT * FROM `users` WHERE username = ? AND password = ?");
@@ -28,10 +27,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($result->num_rows === 1) {
             $row = $result->fetch_assoc();
-            $_SESSION['username'] = $row['username']; // Matches your old code
-            // Optional: also store id if you want
-            // $_SESSION['user_id'] = $row['id'];
-            header("Location: dashboard.php");
+            $_SESSION['username'] = $row['username'];
+
+            // Check if this is the admin user
+            if (strtolower($row['username']) === 'admin') {
+                header("Location: dashboard.php"); // Admin goes to dashboard
+            } else {
+                header("Location: index.php"); // Normal users go to index.php
+            }
             exit();
         } else {
             $errors[] = "Username/password is incorrect.";
