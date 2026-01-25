@@ -1,3 +1,12 @@
+<?php
+session_start();
+// Protect the dashboard - redirect to signin if not logged in
+if (!isset($_SESSION['username'])) {
+    header('Location: signin.php');
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -40,6 +49,16 @@
             background: rgba(251, 191, 36, 0.2);
             border-left-color: #fbbf24;
             color: white;
+        }
+        
+        .nav-item.logout {
+            color: #fca5a5;
+        }
+        
+        .nav-item.logout:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-left-color: #ef4444;
+            color: #fca5a5;
         }
         
         /* E-ink Display Style */
@@ -210,7 +229,7 @@
     
     <!-- SIDEBAR -->
     <aside class="sidebar w-64 fixed h-full left-0 top-0 z-50 hidden lg:block">
-        <div class="p-6">
+        <div class="p-6 flex flex-col h-full">
             <div class="flex items-center gap-3 mb-8">
                 <div class="w-12 h-12 bg-yellow-400 rounded-2xl flex items-center justify-center shadow-lg float-animation">
                     <i class="fas fa-leaf text-green-700 text-2xl"></i>
@@ -221,11 +240,8 @@
                 </div>
             </div>
             
-            <nav class="space-y-2">
-                <a href="index.php" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
-                    <i class="fas fa-home w-5"></i>
-                    <span>Home</span>
-                </a>
+            <nav class="space-y-2 flex-1">
+                <!-- Removed Home link -->
                 <a href="pro_faqs.php" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
                     <i class="fas fa-question-circle w-5"></i>
                     <span>FAQs</span>
@@ -243,6 +259,14 @@
                     <span>Contact</span>
                 </a>
             </nav>
+            
+            <!-- Logout at the bottom -->
+            <div class="mt-auto pt-6 border-t border-white/20">
+                <a href="logout.php" class="nav-item logout flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
+                    <i class="fas fa-sign-out-alt w-5"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
         </div>
     </aside>
 
@@ -462,7 +486,7 @@
         </div>
 
         <!-- MANUAL CRANK CONTROL -->
-        <div class="bg-white rounded-3xl shadow-xl p-8 mb-8 border-2 border border-black">
+        <div class="bg-white rounded-3xl shadow-xl p-8 mb-8 border-2 border-black">
             <div class="flex items-center justify-between mb-6">
                 <div>
                     <h3 class="text-2xl font-bold text-gray-800">Manual Crank Generator</h3>
