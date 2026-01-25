@@ -21,7 +21,7 @@ $team_members = [
         'expertise' => ['Backend Web Development', 'Database Logic', 'Manual Power Generation'],
         'social' => [
             'facebook' => 'https://web.facebook.com/jigsuyaaaaaa',
-            'linkedin' => '#',
+            'linkedin' => 'https://www.linkedin.com/in/jigs-lactao-122894387/',
             'github' => 'https://github.com/jigsuyaaa'
         ],
         'color' => 'green',
