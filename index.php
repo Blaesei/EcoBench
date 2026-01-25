@@ -267,55 +267,31 @@ $impact_items = [
             <div class="pattern-dot"></div>
             <div class="pattern-dot"></div>
         </div>
-        
+
         <div class="cta-shape cta-shape-1"></div>
         <div class="cta-shape cta-shape-2"></div>
-        
+
         <div class="container">
             <div class="cta-content">
                 <div class="cta-icon-wrapper">
                     <div class="cta-icon-circle"></div>
-                    <div class="cta-icon">🚀</div>
+                    <div class="cta-icon">💬</div>
                 </div>
-                
-                <div class="cta-badge">Get Started</div>
-                <h2>Ready to Experience the Future?</h2>
-                <p>Sign in to access our interactive dashboard, explore the prototype showcase, and discover how EcoBench is revolutionizing sustainable campus technology</p>
-                
-                <div class="cta-features-mini">
-                    <div class="cta-mini-item">
+
+                <div class="cta-badge">Get In Touch</div>
+                <h2>Want to Learn More?</h2>
+                <p>We'd love to hear from you! Whether you have questions about our project, suggestions for improvement, or opportunities for collaboration, feel free to reach out.</p>
+
+                <div class="cta-buttons-group">
+                    <a href="contact.php" class="btn btn-primary btn-large">
+                        <span>Contact Us</span>
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <path d="M7 10L9 12L13 8M19 10C19 14.9706 14.9706 19 10 19C5.02944 19 1 14.9706 1 10C1 5.02944 5.02944 1 10 1C14.9706 1 19 5.02944 19 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M4 10H16M16 10L10 4M16 10L10 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                         </svg>
-                        <span>Real-time Monitoring</span>
-                    </div>
-                    <div class="cta-mini-item">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <path d="M7 10L9 12L13 8M19 10C19 14.9706 14.9706 19 10 19C5.02944 19 1 14.9706 1 10C1 5.02944 5.02944 1 10 1C14.9706 1 19 5.02944 19 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                        <span>Interactive Dashboard</span>
-                    </div>
-                    <div class="cta-mini-item">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <path d="M7 10L9 12L13 8M19 10C19 14.9706 14.9706 19 10 19C5.02944 19 1 14.9706 1 10C1 5.02944 5.02944 1 10 1C14.9706 1 19 5.02944 19 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                        <span>Prototype Access</span>
-                    </div>
-                </div>
-                
-                <a href="signin.php" class="btn btn-primary btn-large cta-btn">
-                    <span>Sign In Now</span>
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M4 10H16M16 10L10 4M16 10L10 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                    </svg>
-                </a>
-                
-                <div class="cta-note">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14Z" stroke="currentColor" stroke-width="1.5"/>
-                        <path d="M8 5V8L10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
-                    No credit card required • Instant access
+                    </a>
+                    <a href="faqs.php" class="btn btn-secondary btn-large">
+                        <span>View FAQs</span>
+                    </a>
                 </div>
             </div>
         </div>
