@@ -1,4 +1,7 @@
 <?php
+
+include("auth.php");
+
 // Configuration
 $site_name = "EcoBench";
 $site_tagline = "Sustainable Smart Bench Technology";
