@@ -1,6 +1,6 @@
 <?php
-// signup.php - Modern styled registration matching your signin.php design + your original logic (MD5 + simple insert)
-require('db.php'); // Your database connection file
+// signup.php - Updated: Prevents 'admin' username + checks for duplicate username
+require('db.php');
 session_start();
 
 $errors = [];
@@ -12,9 +12,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
     $password = trim($_POST['password'] ?? '');
 
-    // Simple validation (similar to your example but safer)
+    // Validation
     if (empty($username)) {
         $errors[] = "Username is required.";
+    }
+    if (strtolower($username) === 'admin') {
+        $errors[] = "This username is reserved for the administrator.";
     }
     if (empty($email)) {
         $errors[] = "Email is required.";
@@ -26,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        // Check if username already exists (your table has UNIQUE on username)
+        // Check for duplicate username
         $stmt = $con->prepare("SELECT id FROM users WHERE username = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
@@ -38,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        // Insert like your original example: MD5 hash + trn_date
+        // Register user with MD5
         $hashed_password = md5($password);
         $trn_date = date("Y-m-d H:i:s");
 
@@ -46,8 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param("ssss", $username, $hashed_password, $email, $trn_date);
 
         if ($stmt->execute()) {
-            // Success message like your example (but styled nicely)
-            $success = true;
+            // Success - redirect to signin (or show message if you prefer)
+            header("Location: signin.php");
+            exit();
         } else {
             $errors[] = "Registration failed. Please try again.";
         }
@@ -156,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="form-container">
             <h2 class="form-title">Registration</h2>
 
-            <?php if (!empty($success)): ?>
+            <?php if (isset($success)): ?>
                 <div class="success">
                     You are registered successfully!<br><br>
                     Click here to <a href="signin.php">Sign In</a>
