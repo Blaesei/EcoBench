@@ -70,6 +70,64 @@ if (isset($_POST['add_user'])) {
     exit();
 }
 
+// Handle Edit User
+if (isset($_POST['edit_user'])) {
+    $userId = (int)$_POST['user_id'];
+    $editUsername = trim($_POST['edit_username'] ?? '');
+    $editEmail = trim($_POST['edit_email'] ?? '');
+    $editPassword = trim($_POST['edit_password'] ?? '');
+    $confirmPassword = trim($_POST['edit_confirm_password'] ?? '');
+
+    $errors = [];
+
+    if (empty($editUsername)) {
+        $errors[] = "Username is required.";
+    }
+    if (empty($editEmail) || !filter_var($editEmail, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "Valid email is required.";
+    }
+    
+    // Password is optional for edit, but if provided, must match confirmation
+    if (!empty($editPassword) && $editPassword !== $confirmPassword) {
+        $errors[] = "Passwords do not match.";
+    }
+
+    if (empty($errors)) {
+        // Check duplicate username (excluding current user)
+        $check_stmt = $con->prepare("SELECT id FROM users WHERE username = ? AND id != ?");
+        $check_stmt->bind_param("si", $editUsername, $userId);
+        $check_stmt->execute();
+        if ($check_stmt->get_result()->num_rows > 0) {
+            $errors[] = "Username already taken.";
+        }
+        $check_stmt->close();
+    }
+
+    if (empty($errors)) {
+        if (!empty($editPassword)) {
+            // Update with new password
+            $hashedPassword = md5($editPassword);
+            $update_stmt = $con->prepare("UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?");
+            $update_stmt->bind_param("sssi", $editUsername, $editEmail, $hashedPassword, $userId);
+        } else {
+            // Update without changing password
+            $update_stmt = $con->prepare("UPDATE users SET username = ?, email = ? WHERE id = ?");
+            $update_stmt->bind_param("ssi", $editUsername, $editEmail, $userId);
+        }
+
+        if ($update_stmt->execute()) {
+            $_SESSION['success_message'] = "User updated successfully!";
+        } else {
+            $_SESSION['error_message'] = "Failed to update user.";
+        }
+        $update_stmt->close();
+    } else {
+        $_SESSION['error_message'] = implode("<br>", $errors);
+    }
+    header('Location: users.php');
+    exit();
+}
+
 // Handle Delete
 if (isset($_GET['delete'])) {
     $userId = (int)$_GET['delete'];
@@ -155,6 +213,21 @@ $user_count = mysqli_num_rows($result);
             color: #333;
         }
     </style>
+
+    <script>
+        function openEditModal(userId, username, email) {
+            document.getElementById('edit_user_id').value = userId;
+            document.getElementById('edit_username').value = username;
+            document.getElementById('edit_email').value = email;
+            document.getElementById('edit_password').value = '';
+            document.getElementById('edit_confirm_password').value = '';
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+    </script>
 </head>
 
 <body class="text-gray-800">
@@ -213,7 +286,7 @@ $user_count = mysqli_num_rows($result);
                             <i class="fas fa-users mr-2"></i>
                             <?php echo $user_count; ?> Users
                         </div>
-                        <button onclick="document.getElementById('addModal').classList.remove('hidden')" 
+                        <button onclick="closeModal('editModal'); document.getElementById('addModal').classList.remove('hidden')" 
                                 class="bg-gradient-to-r from-green-600 to-green-700 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition">
                             <i class="fas fa-user-plus mr-2"></i> Add New User
                         </button>
@@ -267,9 +340,10 @@ $user_count = mysqli_num_rows($result);
                                     <td class="px-6 py-4"><?php echo date('M d, Y h:i A', strtotime($row['trn_date'])); ?></td>
                                     <td class="px-6 py-4 text-center">
                                         <?php if ($row['id'] != 1): ?>
-                                            <a href="edit_user.php?id=<?php echo $row['id']; ?>" class="text-blue-600 hover:text-blue-800 font-medium">
+                                            <button onclick="openEditModal(<?php echo $row['id']; ?>, '<?php echo htmlspecialchars($row['username'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($row['email'], ENT_QUOTES); ?>')" 
+                                                    class="text-blue-600 hover:text-blue-800 font-medium cursor-pointer">
                                                 Edit
-                                            </a>
+                                            </button>
                                         <?php else: ?>
                                             <span class="text-gray-400">-</span>
                                         <?php endif; ?>
@@ -296,10 +370,10 @@ $user_count = mysqli_num_rows($result);
 
     </div>
 
-    <!-- ADD USER MODAL - Simplified (no logo, no badge) -->
+    <!-- ADD USER MODAL -->
     <div id="addModal" class="hidden modal-overlay">
         <div class="modal-content">
-            <span class="modal-close" onclick="document.getElementById('addModal').classList.add('hidden')">&times;</span>
+            <span class="modal-close" onclick="closeModal('addModal')">&times;</span>
             
             <h2 class="text-3xl font-bold text-green-800 mb-10">Add New User</h2>
 
@@ -323,6 +397,40 @@ $user_count = mysqli_num_rows($result);
 
                 <button type="submit" name="add_user" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-full transition">
                     Add User
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- EDIT USER MODAL -->
+    <div id="editModal" class="hidden modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('editModal')">&times;</span>
+            
+            <h2 class="text-3xl font-bold text-green-800 mb-10">Edit User</h2>
+
+            <form action="users.php" method="POST">
+                <input type="hidden" name="user_id" id="edit_user_id">
+                
+                <div class="text-left mb-6">
+                    <label class="block text-gray-700 font-semibold mb-2">Username</label>
+                    <input type="text" name="edit_username" id="edit_username" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600" required>
+                </div>
+                <div class="text-left mb-6">
+                    <label class="block text-gray-700 font-semibold mb-2">Email</label>
+                    <input type="email" name="edit_email" id="edit_email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600" required>
+                </div>
+                <div class="text-left mb-6">
+                    <label class="block text-gray-700 font-semibold mb-2">New Password <span class="text-gray-500 text-sm">(leave blank to keep current)</span></label>
+                    <input type="password" name="edit_password" id="edit_password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600">
+                </div>
+                <div class="text-left mb-8">
+                    <label class="block text-gray-700 font-semibold mb-2">Confirm New Password</label>
+                    <input type="password" name="edit_confirm_password" id="edit_confirm_password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600">
+                </div>
+
+                <button type="submit" name="edit_user" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-full transition">
+                    Update User
                 </button>
             </form>
         </div>
