@@ -14,74 +14,69 @@ $nav_items = [
 // Team members data
 $team_members = [
     [
-        'name' => 'Team Member 1',
-        'role' => 'Project Lead & Hardware Engineer',
-        'image' => 'img/team/member1.jpg',
-        'bio' => 'Passionate about sustainable technology and renewable energy solutions. Leading the hardware development and system integration.',
-        'expertise' => ['Solar Systems', 'Circuit Design', 'Project Management'],
+        'name' => 'Jigs C. Lactao',
+        'role' => 'Backend Developer & Electrical Engineer',
+        'image' => 'img/member1.png',
+        'bio' => 'Developed the backend logic of the prototype website and contributed to the manual power generation system.',
+        'expertise' => ['Backend Web Development', 'Database Logic', 'Manual Power Generation'],
         'social' => [
-            'facebook' => '#',
+            'facebook' => 'https://web.facebook.com/jigsuyaaaaaa',
             'linkedin' => '#',
-            'github' => '#'
+            'github' => 'https://github.com/jigsuyaaa'
         ],
         'color' => 'green',
-        'quote' => '"Innovation is turning ideas into sustainable reality."'
     ],
     [
-        'name' => 'Team Member 2',
-        'role' => 'Software Developer & UI/UX Designer',
-        'image' => 'img/team/member2.jpg',
-        'bio' => 'Specializing in creating intuitive interfaces and robust web applications for monitoring and control systems.',
-        'expertise' => ['Web Development', 'UI/UX Design', 'Dashboard Systems'],
+        'name' => 'Mariem O. Manato',
+        'role' => 'System Architect & Electrical Engineer',
+        'image' => 'img/member2.png',
+        'bio' => 'Designed the overall system architecture and was responsible for the manual power generation mechanism.',
+        'expertise' => ['System Architecture Design', 'Manual Power Generation', 'Energy Conversion'],
         'social' => [
-            'facebook' => '#',
-            'linkedin' => '#',
-            'github' => '#'
+            'facebook' => 'https://web.facebook.com/yemakeki',
+            'linkedin' => 'https://www.linkedin.com/in/mariem-manato-97628b360/',
+            'github' => 'https://github.com/yemakeki'
         ],
         'color' => 'blue',
-        'quote' => '"Design is not just what it looks like, it\'s how it works."'
     ],
     [
-        'name' => 'Team Member 3',
-        'role' => 'Electrical Engineer & Data Analyst',
-        'image' => 'img/team/member3.jpg',
-        'bio' => 'Expert in power management systems and energy monitoring. Analyzing data to optimize bench performance.',
-        'expertise' => ['Power Systems', 'Data Analysis', 'IoT Integration'],
+        'name' => 'Audrey Nicole Q. Mesa',
+        'role' => 'Project Lead & UI/UX Designer',
+        'image' => 'img/member3.png',
+        'bio' => 'Led the team, designed the UI/UX for both the monitoring system and the prototype website, and handled the solar component of the EcoBench.',
+        'expertise' => ['UI/UX Design', 'Web Interface Design', 'Solar Systems Integration'],
         'social' => [
-            'facebook' => '#',
-            'linkedin' => '#',
-            'github' => '#'
+            'facebook' => 'https://web.facebook.com/audreynicole.19',
+            'linkedin' => 'https://www.linkedin.com/in/audrey-nicole-mesa-b8895732a/',
+            'github' => 'https://github.com/msaudreyncl'
         ],
         'color' => 'yellow',
-        'quote' => '"Data drives decisions, efficiency drives change."'
     ],
     [
-        'name' => 'Team Member 4',
-        'role' => 'Mechanical Designer & Fabrication Specialist',
-        'image' => 'img/team/member4.jpg',
-        'bio' => 'Designing ergonomic and durable bench structures that withstand outdoor conditions while maintaining aesthetics.',
-        'expertise' => ['CAD Design', 'Material Selection', 'Fabrication'],
+        'name' => 'Marcus Cedric S. Pedrosa',
+        'role' => 'Monitoring System Developer & Hardware Engineer',
+        'image' => 'img/member4.png',
+        'bio' => 'Managed both the backend development and hardware implementation of the EcoBench monitoring system.',
+        'expertise' => ['IoT Systems', 'Hardware Integration', 'Monitoring & Data Systems'],
         'social' => [
-            'facebook' => '#',
-            'linkedin' => '#',
-            'github' => '#'
+            'facebook' => 'https://web.facebook.com/marcuscedric.pedrosa',
+            'linkedin' => 'https://www.linkedin.com/in/marcus-cedric-pedrosa-1b58b0269/',
+            'github' => 'https://github.com/CedZzzzzzzzz'
         ],
         'color' => 'purple',
-        'quote' => '"Form follows function, but both embrace sustainability."'
     ],
     [
-        'name' => 'Team Member 5',
-        'role' => 'Sustainability Coordinator & Researcher',
-        'image' => 'img/team/member5.jpg',
-        'bio' => 'Ensuring our project meets environmental standards and researching innovative sustainable practices.',
-        'expertise' => ['Environmental Impact', 'Research', 'Sustainability'],
+        'name' => 'Quinn harvey G. Pineda',
+        'role' => 'Project Coordinator & Technical Specialist',
+        'image' => 'img/member5.png',
+        'bio' => 'Coordinated project tasks and progress while providing technical support and implementation for the solar power component and overall system of the EcoBench.',
+        'expertise' => ['Hardware Integration', 'Solar Power Systems', 'System Support & Integration'],
         'social' => [
-            'facebook' => '#',
-            'linkedin' => '#',
-            'github' => '#'
+            'facebook' => 'https://web.facebook.com/Yevrah.pineda.7',
+            'linkedin' => 'https://www.linkedin.com/in/quinn-pineda/',
+            'github' => 'https://github.com/Blaesei'
         ],
         'color' => 'teal',
-        'quote' => '"The future is green, and it starts today."'
     ]
 ];
 
@@ -920,16 +915,6 @@ $core_values = [
             margin-bottom: var(--spacing-sm);
         }
 
-        /* Team Quote on Front */
-        .team-quote-front {
-            font-size: 0.875rem;
-            font-style: italic;
-            color: var(--color-eco-green);
-            margin-top: var(--spacing-sm);
-            padding: var(--spacing-sm) 0;
-            border-top: 2px solid var(--color-light-gray);
-        }
-
         /* Team Card Back */
         .team-card-back {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
@@ -1405,7 +1390,6 @@ $core_values = [
                                 <div class="team-info">
                                     <h3><?php echo $member['name']; ?></h3>
                                     <p class="team-role"><?php echo $member['role']; ?></p>
-                                    <div class="team-quote-front"><?php echo $member['quote']; ?></div>
                                 </div>
                             </div>
 
