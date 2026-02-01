@@ -1,20 +1,8 @@
-# --- Security ---
+# Ignore the actual database connection file
+frontend/includes/db.php
+
+# Ignore Python environment and sensitive files
 .env
-
-# --- Python ---
-**/__pycache__/
-*.py[cod]
-*$py.class
-
-# --- Virtual Environments ---
+__pycache__/
 venv/
-.venv/
-env/
-
-# --- IDEs and Tools ---
 .vscode/
-.idea/
-.DS_Store
-
-# Database 
-setup_database.sql

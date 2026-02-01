@@ -1,5 +1,6 @@
 // ===================================
 // ECOBENCH DASHBOARD JAVASCRIPT
+// Real-time data integration with Python backend
 // ===================================
 
 // Global variables
@@ -7,6 +8,10 @@ let crankActive = false;
 let crankInterval = null;
 let crankStartTime = null;
 let updateInterval = null;
+
+// API Configuration
+const API_BASE_URL = '/api';
+const UPDATE_INTERVAL = 5000; // 5 seconds
 
 // ===================================
 // DATE AND TIME DISPLAY
@@ -22,7 +27,8 @@ function updateDateTime() {
         second: '2-digit',
         hour12: false 
     });
-    document.getElementById('currentTime').textContent = timeString;
+    const timeEl = document.getElementById('currentTime');
+    if (timeEl) timeEl.textContent = timeString;
     
     // Update date
     const dateString = now.toLocaleDateString('en-US', { 
@@ -30,155 +36,271 @@ function updateDateTime() {
         day: 'numeric', 
         year: 'numeric' 
     });
-    document.getElementById('currentDate').textContent = dateString;
+    const dateEl = document.getElementById('currentDate');
+    if (dateEl) dateEl.textContent = dateString;
 }
 
 // ===================================
-// DASHBOARD DATA SIMULATION
+// FETCH REAL DATA FROM BACKEND
 // ===================================
 
-function updateDashboard() {
-    // Get current battery percentage
-    const batteryPercentText = document.getElementById('batteryPercentLarge').textContent;
-    const currentBattery = parseInt(batteryPercentText);
+async function fetchSensorData() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/get_current_status.php`);
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+            updateDashboardWithRealData(result.data);
+        } else {
+            console.warn('No sensor data available:', result.message);
+            // Keep using simulated data or show message
+            showNoDataMessage();
+        }
+    } catch (error) {
+        console.error('Error fetching sensor data:', error);
+        // Fallback to simulation if API fails
+        console.log('Using simulated data as fallback');
+    }
+}
+
+// ===================================
+// UPDATE DASHBOARD WITH REAL DATA
+// ===================================
+
+function updateDashboardWithRealData(data) {
+    // BATTERY STATUS
+    const batteryPercent = data.battery_percentage || 0;
+    const voltage = data.system_voltage || 0;
     
-    // Simulate battery change (slight increase if charging, decrease if discharging)
-    const isCharging = Math.random() > 0.2; // 80% chance of charging
-    const batteryChange = isCharging ? (Math.random() * 2) : -(Math.random() * 0.5);
-    const newBattery = Math.min(100, Math.max(0, currentBattery + batteryChange));
-    const batteryRounded = Math.round(newBattery);
+    updateElement('batteryPercentLarge', batteryPercent + '%');
+    updateElement('voltageDisplay', voltage.toFixed(1) + 'V');
     
-    // Update battery displays
-    document.getElementById('batteryPercentLarge').textContent = batteryRounded + '%';
     const batteryBar = document.getElementById('batteryBarMain');
-    batteryBar.style.width = batteryRounded + '%';
+    if (batteryBar) batteryBar.style.width = batteryPercent + '%';
     
-    // Update battery status text
-    const batteryStatusText = isCharging ? 'CHARGING' : 'DISCHARGING';
-    document.getElementById('batteryMainStatus').textContent = batteryStatusText;
-    document.getElementById('batteryMainStatus').style.color = isCharging ? '#16a34a' : '#dc2626';
+    // Battery status text
+    const isCharging = data.charge_rate > 0;
+    const batteryStatusEl = document.getElementById('batteryMainStatus');
+    if (batteryStatusEl) {
+        batteryStatusEl.textContent = isCharging ? 'CHARGING' : 'STANDBY';
+        batteryStatusEl.style.color = isCharging ? '#16a34a' : '#6b7280';
+    }
     
     // Low battery warning
     const warningDiv = document.getElementById('lowBatteryWarning');
-    if (batteryRounded < 20) {
-        warningDiv.classList.remove('hidden');
-    } else {
-        warningDiv.classList.add('hidden');
+    if (warningDiv) {
+        if (data.low_battery_warning || batteryPercent < 20) {
+            warningDiv.classList.remove('hidden');
+        } else {
+            warningDiv.classList.add('hidden');
+        }
     }
     
-    // Update voltage (12V system with slight variations)
-    const voltage = (12.0 + Math.random() * 0.8).toFixed(1);
-    document.getElementById('voltageDisplay').textContent = voltage + 'V';
+    // POWER METRICS
+    const totalWatts = data.total_incoming_watts || 0;
+    updateElement('totalWattsBig', totalWatts.toFixed(1) + 'W');
+    updateElement('solarPowerDisplay', totalWatts.toFixed(1) + 'W');
     
-    // Update capacity
-    const capacity = (8.0 + Math.random() * 1.0).toFixed(1);
-    document.getElementById('capacityDisplay').textContent = capacity + 'Ah';
-    
-    // Update charge/discharge rate
-    const rate = (Math.random() * 3).toFixed(1);
-    const chargeRateDisplay = document.getElementById('chargeRateDisplay');
-    chargeRateDisplay.textContent = (isCharging ? '+' : '-') + rate + 'A';
-    chargeRateDisplay.style.color = isCharging ? '#16a34a' : '#dc2626';
-    
-    // Update runtime
-    const runtime = (4 + Math.random() * 4).toFixed(1);
-    document.getElementById('runtimeDisplay').textContent = runtime + 'h';
-    
-    // Update solar power
-    const hour = new Date().getHours();
-    let solarMultiplier = 0;
-    if (hour >= 6 && hour < 18) {
-        // Daytime - simulate solar curve
-        const noon = 12;
-        const distFromNoon = Math.abs(hour - noon);
-        solarMultiplier = Math.max(0, 1 - (distFromNoon / 6)) * (0.8 + Math.random() * 0.2);
+    // Charge rate
+    const chargeRate = data.charge_rate || 0;
+    const chargeRateEl = document.getElementById('chargeRateDisplay');
+    if (chargeRateEl) {
+        chargeRateEl.textContent = (chargeRate > 0 ? '+' : '') + chargeRate.toFixed(1) + 'A';
+        chargeRateEl.style.color = chargeRate > 0 ? '#16a34a' : '#6b7280';
     }
-    const solarPower = (solarMultiplier * 150).toFixed(1);
-    document.getElementById('solarPowerDisplay').textContent = solarPower + 'W';
     
-    // Update total incoming power
-    const crankPower = parseFloat(document.getElementById('crankPowerDisplay').textContent) || 0;
-    const totalWatts = (parseFloat(solarPower) + crankPower).toFixed(1);
-    document.getElementById('totalWattsBig').textContent = totalWatts + 'W';
+    // Runtime
+    const runtime = data.estimated_runtime || 0;
+    updateElement('runtimeDisplay', runtime.toFixed(1) + 'h');
     
-    // Update energy balance
-    const consumption = 50 + Math.random() * 30; // Simulated consumption
-    const balance = parseFloat(totalWatts) - consumption;
-    const balancePercent = Math.min(100, Math.max(0, 50 + (balance / 2)));
+    // Capacity (calculate from battery percentage and capacity)
+    const capacity = ((batteryPercent / 100) * 300).toFixed(1); // 300Ah battery
+    updateElement('capacityDisplay', capacity + 'Ah');
     
-    document.getElementById('balanceFill').style.width = balancePercent + '%';
-    document.getElementById('balanceIndicator').style.left = balancePercent + '%';
-    document.getElementById('balanceValue').textContent = (balance > 0 ? '+' : '') + balance.toFixed(0) + 'W';
+    // ENERGY BALANCE
+    const balance = data.energy_balance || 0;
+    const consumption = Math.abs(balance < 0 ? balance : 0);
+    const netBalance = balance;
     
-    // Update balance status text
+    // Balance bar (0-100% scale, 50% = neutral)
+    const balancePercent = Math.min(100, Math.max(0, 50 + (netBalance / 2)));
+    
+    const balanceFill = document.getElementById('balanceFill');
+    if (balanceFill) balanceFill.style.width = balancePercent + '%';
+    
+    const balanceIndicator = document.getElementById('balanceIndicator');
+    if (balanceIndicator) balanceIndicator.style.left = balancePercent + '%';
+    
+    updateElement('balanceValue', (netBalance > 0 ? '+' : '') + netBalance.toFixed(0) + 'W');
+    
+    // Balance status text
     let balanceText = '';
     let balanceColor = '';
-    if (balance > 20) {
+    if (netBalance > 20) {
         balanceText = 'System Charging Normally';
         balanceColor = '#16a34a';
-    } else if (balance > 0) {
+    } else if (netBalance > 0) {
         balanceText = 'Low Charge Rate';
         balanceColor = '#f59e0b';
     } else {
         balanceText = 'Battery Discharging';
         balanceColor = '#dc2626';
     }
-    document.getElementById('balanceStatusText').textContent = balanceText;
-    document.getElementById('balanceStatusText').style.color = balanceColor;
     
-    // Update battery bank status
-    document.getElementById('batteryBankStatus').textContent = isCharging ? 'Charging' : 'Discharging';
-    document.getElementById('batteryCurrentDisplay').textContent = (isCharging ? '+' : '-') + rate + 'A';
+    const balanceStatusEl = document.getElementById('balanceStatusText');
+    if (balanceStatusEl) {
+        balanceStatusEl.textContent = balanceText;
+        balanceStatusEl.style.color = balanceColor;
+    }
     
-    // Update port count
-    const activePorts = document.querySelectorAll('.port-item.port-charging').length;
-    const availablePorts = document.querySelectorAll('.port-item.port-available').length;
-    document.getElementById('portsActive').textContent = activePorts;
-    document.getElementById('portsAvailable').textContent = availablePorts;
+    // CRANK STATUS
+    const crankIsActive = data.is_crank_active || false;
+    const crankStatusEl = document.getElementById('crankStatus');
+    const crankPowerEl = document.getElementById('crankPowerDisplay');
+    const crankCard = document.getElementById('crankCard');
     
-    // Update analytics values with slight variations
-    const currentUptime = parseFloat(document.getElementById('uptimeDisplay').textContent) || 6.5;
-    document.getElementById('uptimeDisplay').textContent = (currentUptime + 0.017).toFixed(1) + ' hrs'; // ~1 min per update
+    if (crankIsActive) {
+        if (crankCard) crankCard.classList.add('active');
+        if (crankStatusEl) {
+            crankStatusEl.textContent = 'Active';
+            crankStatusEl.style.color = '#16a34a';
+        }
+        // Estimate crank power (when active, assume it contributes to total power)
+        const estimatedCrankPower = (totalWatts * 0.3).toFixed(1); // Assume 30% contribution
+        if (crankPowerEl) {
+            crankPowerEl.textContent = estimatedCrankPower + 'W';
+            crankPowerEl.style.color = '#16a34a';
+        }
+    } else {
+        if (crankCard) crankCard.classList.remove('active');
+        if (crankStatusEl) {
+            crankStatusEl.textContent = 'Standby';
+            crankStatusEl.style.color = '';
+        }
+        if (crankPowerEl) {
+            crankPowerEl.textContent = '0.0W';
+            crankPowerEl.style.color = '';
+        }
+    }
     
-    const currentEnergyToday = parseFloat(document.getElementById('energyTodayDisplay').textContent) || 3.45;
-    document.getElementById('energyTodayDisplay').textContent = (currentEnergyToday + 0.01).toFixed(2) + ' kWh';
+    // BATTERY BANK STATUS
+    const batteryBankStatusEl = document.getElementById('batteryBankStatus');
+    if (batteryBankStatusEl) {
+        batteryBankStatusEl.textContent = isCharging ? 'Charging' : 'Standby';
+    }
     
-    const currentEnergyWeek = parseFloat(document.getElementById('energyWeekDisplay').textContent) || 18.2;
-    document.getElementById('energyWeekDisplay').textContent = (currentEnergyWeek + 0.01).toFixed(1) + ' kWh';
+    const batteryCurrentEl = document.getElementById('batteryCurrentDisplay');
+    if (batteryCurrentEl) {
+        batteryCurrentEl.textContent = (chargeRate > 0 ? '+' : '') + chargeRate.toFixed(1) + 'A';
+    }
     
-    const efficiency = (85 + Math.random() * 5).toFixed(0);
-    document.getElementById('efficiencyDisplay').textContent = efficiency + '%';
+    // SYSTEM STATUS
+    const systemStatusEl = document.getElementById('systemStatusText');
+    if (systemStatusEl) {
+        systemStatusEl.textContent = data.status ? data.status.toUpperCase() : 'ONLINE';
+    }
+    
+    // Update analytics incrementally (keeping your animation logic)
+    updateAnalytics(totalWatts, chargeRate);
 }
 
 // ===================================
-// PORT STATUS RANDOMIZATION
+// HELPER FUNCTIONS
+// ===================================
+
+function updateElement(id, value) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.textContent = value;
+    }
+}
+
+function showNoDataMessage() {
+    // Show message that Python backend might not be running
+    console.warn('No sensor data available. Make sure Python backend is running on port 8000');
+    
+    // Optionally update UI to show "Waiting for data..."
+    updateElement('totalWattsBig', '--W');
+    updateElement('batteryPercentLarge', '--%');
+    updateElement('voltageDisplay', '--V');
+}
+
+// ===================================
+// ANALYTICS UPDATE (INCREMENTAL)
+// ===================================
+
+function updateAnalytics(currentPower, chargeRate) {
+    // Uptime - increment by update interval
+    const uptimeEl = document.getElementById('uptimeDisplay');
+    if (uptimeEl) {
+        const currentUptime = parseFloat(uptimeEl.textContent) || 0;
+        const incrementHours = (UPDATE_INTERVAL / 1000 / 3600); // Convert ms to hours
+        uptimeEl.textContent = (currentUptime + incrementHours).toFixed(1) + ' hrs';
+    }
+    
+    // Energy today - increment based on current power
+    const energyTodayEl = document.getElementById('energyTodayDisplay');
+    if (energyTodayEl) {
+        const currentEnergy = parseFloat(energyTodayEl.textContent) || 0;
+        const incrementKWh = (currentPower * UPDATE_INTERVAL / 1000 / 3600 / 1000); // W * hours -> kWh
+        energyTodayEl.textContent = (currentEnergy + incrementKWh).toFixed(2) + ' kWh';
+    }
+    
+    // Energy week
+    const energyWeekEl = document.getElementById('energyWeekDisplay');
+    if (energyWeekEl) {
+        const currentWeek = parseFloat(energyWeekEl.textContent) || 18.2;
+        const incrementWeek = (currentPower * UPDATE_INTERVAL / 1000 / 3600 / 1000);
+        energyWeekEl.textContent = (currentWeek + incrementWeek).toFixed(1) + ' kWh';
+    }
+    
+    // Efficiency (based on charge rate vs capacity)
+    const efficiencyEl = document.getElementById('efficiencyDisplay');
+    if (efficiencyEl) {
+        const maxChargeRate = 30; // 30A max from config
+        const efficiency = Math.min(100, Math.max(50, (chargeRate / maxChargeRate) * 100));
+        efficiencyEl.textContent = efficiency.toFixed(0) + '%';
+    }
+}
+
+// ===================================
+// PORT STATUS RANDOMIZATION (Keep your original logic)
 // ===================================
 
 function randomizePortStatus() {
     const ports = document.querySelectorAll('.port-item');
     
-    // Randomly change one port status
-    if (Math.random() > 0.7) {
+    if (Math.random() > 0.7 && ports.length > 0) {
         const randomPort = ports[Math.floor(Math.random() * ports.length)];
         
         if (randomPort.classList.contains('port-charging')) {
             randomPort.classList.remove('port-charging');
             randomPort.classList.add('port-available');
-            randomPort.querySelector('.port-status').textContent = 'AVAILABLE';
-            randomPort.querySelector('.port-specs').textContent = 'Ready';
+            const statusEl = randomPort.querySelector('.port-status');
+            const specsEl = randomPort.querySelector('.port-specs');
+            if (statusEl) statusEl.textContent = 'AVAILABLE';
+            if (specsEl) specsEl.textContent = 'Ready';
         } else {
             randomPort.classList.remove('port-available');
             randomPort.classList.add('port-charging');
-            randomPort.querySelector('.port-status').textContent = 'CHARGING';
+            const statusEl = randomPort.querySelector('.port-status');
+            const specsEl = randomPort.querySelector('.port-specs');
+            if (statusEl) statusEl.textContent = 'CHARGING';
             const voltage = (5.0).toFixed(1);
             const current = (1.5 + Math.random() * 1.0).toFixed(1);
-            randomPort.querySelector('.port-specs').textContent = `${voltage}V / ${current}A`;
+            if (specsEl) specsEl.textContent = `${voltage}V / ${current}A`;
         }
+        
+        // Update port counts
+        const activePorts = document.querySelectorAll('.port-item.port-charging').length;
+        const availablePorts = document.querySelectorAll('.port-item.port-available').length;
+        updateElement('portsActive', activePorts);
+        updateElement('portsAvailable', availablePorts);
     }
 }
 
 // ===================================
-// MANUAL CRANK CONTROL
+// MANUAL CRANK CONTROL (Keep your original logic)
 // ===================================
 
 function toggleCrank() {
@@ -193,51 +315,54 @@ function toggleCrank() {
     
     if (crankActive) {
         // Activate crank
-        crankCard.classList.add('active');
-        crankStatus.textContent = 'Active';
-        crankStatus.style.color = '#16a34a';
-        crankActiveStatus.classList.remove('hidden');
-        crankButton.classList.add('active');
-        crankButtonText.textContent = 'STOP CRANK';
+        if (crankCard) crankCard.classList.add('active');
+        if (crankStatus) {
+            crankStatus.textContent = 'Active';
+            crankStatus.style.color = '#16a34a';
+        }
+        if (crankActiveStatus) crankActiveStatus.classList.remove('hidden');
+        if (crankButton) crankButton.classList.add('active');
+        if (crankButtonText) crankButtonText.textContent = 'STOP CRANK';
         
         crankStartTime = Date.now();
         
-        // Simulate cranking with varying power output
         crankInterval = setInterval(() => {
             if (!crankActive) {
                 clearInterval(crankInterval);
                 return;
             }
             
-            // Random power between 35W and 55W
             const power = (35 + Math.random() * 20).toFixed(1);
-            crankPowerDisplay.textContent = power + 'W';
-            crankPowerDisplay.style.color = '#16a34a';
-            document.getElementById('crankOutputValue').textContent = power + 'W';
-            document.getElementById('crankInstantOutput').textContent = power + 'W';
+            if (crankPowerDisplay) {
+                crankPowerDisplay.textContent = power + 'W';
+                crankPowerDisplay.style.color = '#16a34a';
+            }
+            updateElement('crankOutputValue', power + 'W');
+            updateElement('crankInstantOutput', power + 'W');
             
-            // Random RPM between 100 and 150
             const rpm = Math.floor(100 + Math.random() * 50);
-            document.getElementById('crankRPM').textContent = rpm;
+            updateElement('crankRPM', rpm);
             
-            // Update duration
             const duration = Math.floor((Date.now() - crankStartTime) / 1000);
             const minutes = Math.floor(duration / 60);
             const seconds = duration % 60;
-            document.getElementById('crankDuration').textContent = 
-                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            updateElement('crankDuration', `${minutes}:${seconds.toString().padStart(2, '0')}`);
         }, 500);
         
     } else {
         // Deactivate crank
-        crankCard.classList.remove('active');
-        crankStatus.textContent = 'Standby';
-        crankStatus.style.color = '';
-        crankPowerDisplay.textContent = '0.0W';
-        crankPowerDisplay.style.color = '';
-        crankActiveStatus.classList.add('hidden');
-        crankButton.classList.remove('active');
-        crankButtonText.textContent = 'ACTIVATE CRANK';
+        if (crankCard) crankCard.classList.remove('active');
+        if (crankStatus) {
+            crankStatus.textContent = 'Standby';
+            crankStatus.style.color = '';
+        }
+        if (crankPowerDisplay) {
+            crankPowerDisplay.textContent = '0.0W';
+            crankPowerDisplay.style.color = '';
+        }
+        if (crankActiveStatus) crankActiveStatus.classList.add('hidden');
+        if (crankButton) crankButton.classList.remove('active');
+        if (crankButtonText) crankButtonText.textContent = 'ACTIVATE CRANK';
         
         if (crankInterval) {
             clearInterval(crankInterval);
@@ -251,15 +376,17 @@ function toggleCrank() {
 // ===================================
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('EcoBench Dashboard initializing...');
+    
     // Update date and time immediately and every second
     updateDateTime();
     setInterval(updateDateTime, 1000);
     
-    // Update dashboard immediately
-    updateDashboard();
+    // Fetch real sensor data immediately
+    fetchSensorData();
     
-    // Update dashboard every 3 seconds
-    updateInterval = setInterval(updateDashboard, 3000);
+    // Update dashboard with real data every 5 seconds
+    updateInterval = setInterval(fetchSensorData, UPDATE_INTERVAL);
     
     // Randomize port status every 10 seconds
     setInterval(randomizePortStatus, 10000);
@@ -278,5 +405,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }, index * 50);
     });
     
-    console.log('EcoBench Dashboard initialized successfully');
+    console.log('EcoBench Dashboard initialized - fetching real sensor data every 5 seconds');
+    console.log('API Endpoint:', `${API_BASE_URL}/get_current_status.php`);
 });

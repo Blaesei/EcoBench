@@ -1,16 +1,16 @@
 <?php
-require('db.php');
+require('../includes/db.php');
 session_start();
 
 // Protect the page
 if (!isset($_SESSION['username'])) {
-    header('Location: signin.php');
+    header('Location: /public/signin.php');
     exit();
 }
 
 // Only admin can access this page
 if (strtolower($_SESSION['username']) !== 'admin') {
-    header('Location: index.php');
+    header('Location: /public/index.php');
     exit();
 }
 
@@ -165,7 +165,7 @@ $user_count = mysqli_num_rows($result);
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
 
     <script>
         tailwind.config = {
@@ -239,7 +239,7 @@ $user_count = mysqli_num_rows($result);
             <div class="p-6 flex flex-col h-full">
                 <div class="logo-container mb-8">
                     <div class="logo-wrapper">
-                        <img src="img/EcoBench Logo.png" alt="EcoBench Logo" class="ecobench-logo">
+                        <img src="/assets/img/EcoBench Logo.png" alt="EcoBench Logo" class="ecobench-logo">
                         <div class="logo-glow"></div>
                         <div class="logo-particles">
                             <span class="particle"></span>
@@ -263,7 +263,7 @@ $user_count = mysqli_num_rows($result);
                 </nav>
 
                 <div class="mt-auto pt-6 border-t border-white/20">
-                    <a href="logout.php" class="nav-item logout flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
+                    <a href="../logout.php" class="nav-item logout flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
                         <i class="fas fa-sign-out-alt w-5"></i>
                         <span>Logout</span>
                     </a>
@@ -350,7 +350,7 @@ $user_count = mysqli_num_rows($result);
                                     </td>
                                     <td class="px-6 py-4 text-center">
                                         <?php if ($row['id'] != 1): ?>
-                                            <a href="users.php?delete=<?php echo $row['id']; ?>" 
+                                            <a href="/admin/users.php?delete=<?php echo $row['id']; ?>" 
                                                onclick="return confirm('Are you sure you want to delete this user?')"
                                                class="text-red-600 hover:text-red-800 font-medium">
                                                 Delete
@@ -377,7 +377,7 @@ $user_count = mysqli_num_rows($result);
             
             <h2 class="text-3xl font-bold text-green-800 mb-10">Add New User</h2>
 
-            <form action="users.php" method="POST">
+            <form action="/admin/users.php" method="POST">
                 <div class="text-left mb-6">
                     <label class="block text-gray-700 font-semibold mb-2">Username</label>
                     <input type="text" name="username" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-green-600" required>
@@ -409,7 +409,7 @@ $user_count = mysqli_num_rows($result);
             
             <h2 class="text-3xl font-bold text-green-800 mb-10">Edit User</h2>
 
-            <form action="users.php" method="POST">
+            <form action="/admin/users.php" method="POST">
                 <input type="hidden" name="user_id" id="edit_user_id">
                 
                 <div class="text-left mb-6">

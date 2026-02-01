@@ -2,7 +2,7 @@
 session_start();
 // Protect the dashboard - redirect to signin if not logged in
 if (!isset($_SESSION['username'])) {
-    header('Location: signin.php');
+    header('Location: ../public/signin.php');
     exit();
 }
 ?>
@@ -20,7 +20,7 @@ if (!isset($_SESSION['username'])) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
 
     <script>
         tailwind.config = {
@@ -46,7 +46,7 @@ if (!isset($_SESSION['username'])) {
                 <!-- Logo Section with Creative Design -->
                 <div class="logo-container mb-8">
                     <div class="logo-wrapper">
-                        <img src="img/EcoBench Logo.png" alt="EcoBench Logo" class="ecobench-logo">
+                        <img src="../assets/img/EcoBench Logo.png" alt="EcoBench Logo" class="ecobench-logo">
                         <div class="logo-glow"></div>
                         <div class="logo-particles">
                             <span class="particle"></span>
@@ -70,7 +70,7 @@ if (!isset($_SESSION['username'])) {
                 </nav>
 
                 <div class="mt-auto pt-6 border-t border-white/20">
-                    <a href="logout.php" class="nav-item logout flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
+                    <a href="../logout.php" class="nav-item logout flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
                         <i class="fas fa-sign-out-alt w-5"></i>
                         <span>Logout</span>
                     </a>
@@ -496,7 +496,7 @@ if (!isset($_SESSION['username'])) {
 
     </div>
 
-    <script src="dashboard.js"></script>
+    <script src="../assets/js/dashboard.js"></script>
 
 </body>
 

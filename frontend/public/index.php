@@ -1,6 +1,6 @@
 <?php
 
-include("auth.php");
+include("../includes/auth.php");
 
 // Configuration
 $site_name = "EcoBench";
@@ -16,9 +16,9 @@ $nav_items = [
 
 // Slideshow images (add your image paths here)
 $slideshow_images = [
-    ['src' => 'img/slide1.png', 'alt' => 'EcoBench in campus environment'],
-    ['src' => 'img/slide2.png', 'alt' => 'Solar-powered charging station'],
-    ['src' => 'img/slide3.png', 'alt' => 'Students using EcoBench']
+    ['src' => '../assets/img/slide1.png', 'alt' => 'EcoBench in campus environment'],
+    ['src' => '../assets/img/slide2.png', 'alt' => 'Solar-powered charging station'],
+    ['src' => '../assets/img/slide3.png', 'alt' => 'Students using EcoBench']
 ];
 
 // Features data
@@ -83,7 +83,7 @@ $impact_items = [
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Stylesheet -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png">
@@ -105,7 +105,7 @@ $impact_items = [
         <div class="container">
             <div class="header-content">
                 <a href="index.php" class="logo">
-                    <img class="logo-icon" src="img/EcoBench Logo.png" alt="EcoBench Logo">
+                    <img class="logo-icon" src="../assets/img/EcoBench Logo.png" alt="EcoBench Logo">
                 </a>
 
                 <nav class="nav-menu" id="navMenu">
@@ -152,7 +152,7 @@ $impact_items = [
                 Sustainable Innovation
             </div>
             <div class="hero-logo-wrapper">
-                <img src="img/EcoBench Logo.png" alt="EcoBench" class="hero-logo">
+                <img src="../assets/img/EcoBench Logo.png" alt="EcoBench" class="hero-logo">
             </div>
             <p class="hero-description">
                 A sustainable smart bench that combines renewable-powered device charging, seating,
@@ -303,7 +303,7 @@ $impact_items = [
             <div class="footer-content">
                 <div class="footer-brand">
                     <div class="logo">
-                        <img class="logo-icon" src="img/EcoBench Logo.png" alt="EcoBench Logo">
+                        <img class="logo-icon" src="../assets/img/EcoBench Logo.png" alt="EcoBench Logo">
                     </div>
                     <div class="social-links">
                         <a href="#" aria-label="Facebook"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -358,7 +358,7 @@ $impact_items = [
     </footer>
 
     <!-- JavaScript -->
-    <script src="script.js"></script>
+    <script src="../assets/js/script.js"></script>
 </body>
 
 </html>

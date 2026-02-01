@@ -1,6 +1,6 @@
 <?php
 
-include("auth.php");
+include("../includes/auth.php");
 
 // Configuration
 $site_name = "EcoBench";
@@ -48,8 +48,8 @@ $social_links = [
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="contact.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/contact.css">
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png">
@@ -831,7 +831,7 @@ $social_links = [
         <div class="container">
             <div class="header-content">
                 <a href="index.php" class="logo">
-                    <img class="logo-icon" src="img/EcoBench Logo.png" alt="EcoBench Logo">
+                    <img class="logo-icon" src="../assets/img/EcoBench Logo.png" alt="EcoBench Logo">
                 </a>
 
                 <nav class="nav-menu" id="navMenu">
@@ -1129,7 +1129,7 @@ $social_links = [
             <div class="footer-content">
                 <div class="footer-brand">
                     <div class="logo">
-                        <img class="logo-icon" src="img/EcoBench Logo.png" alt="EcoBench Logo">
+                        <img class="logo-icon" src="../assets/img/EcoBench Logo.png" alt="EcoBench Logo">
                     </div>
                     <div class="social-links">
                         <a href="<?php echo $social_links['facebook']; ?>" aria-label="Facebook">
@@ -1189,7 +1189,7 @@ $social_links = [
     </footer>
 
     <!-- JavaScript -->
-    <script src="script.js"></script>
+    <script src="../assets/js/script.js"></script>
     <script>
         // Contact form handling
         document.getElementById('contactForm').addEventListener('submit', function(e) {

@@ -1,6 +1,6 @@
 <?php
-// signup.php - Updated: Prevents 'admin' username + checks for duplicate username
-require('db.php');
+
+require(__DIR__ . '/../includes/db.php');
 session_start();
 
 $errors = [];
@@ -588,7 +588,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="signup-container">
         <div class="logo-wrapper">
-            <img src="img/EcoBench Logo.png" alt="EcoBench Logo" class="logo-img">
+            <img src="../assets/img/EcoBench Logo.png" alt="EcoBench Logo" class="logo-img">
         </div>
 
         <div class="signup-card">

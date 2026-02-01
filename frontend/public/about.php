@@ -1,6 +1,6 @@
 <?php
 
-include("auth.php");
+include("../includes/auth.php");
 
 // Configuration
 $site_name = "EcoBench";
@@ -19,7 +19,7 @@ $team_members = [
     [
         'name' => 'Jigs C. Lactao',
         'role' => 'Backend Developer & Electrical Engineer',
-        'image' => 'img/member1.png',
+        'image' => '../assets/img/member1.png',
         'bio' => 'Developed the backend logic of the prototype website and contributed to the manual power generation system.',
         'expertise' => ['Backend Web Development', 'Database Logic', 'Manual Power Generation'],
         'social' => [
@@ -32,7 +32,7 @@ $team_members = [
     [
         'name' => 'Mariem O. Manato',
         'role' => 'System Architect & Electrical Engineer',
-        'image' => 'img/member2.png',
+        'image' => '../assets/img/member2.png',
         'bio' => 'Designed the overall system architecture and was responsible for the manual power generation mechanism.',
         'expertise' => ['System Architecture Design', 'Manual Power Generation', 'Energy Conversion'],
         'social' => [
@@ -45,7 +45,7 @@ $team_members = [
     [
         'name' => 'Audrey Nicole Q. Mesa',
         'role' => 'Project Lead & UI/UX Designer',
-        'image' => 'img/member3.png',
+        'image' => '../assets/img/member3.png',
         'bio' => 'Led the team, designed the UI/UX for both the monitoring system and the prototype website, and handled the solar component of the EcoBench.',
         'expertise' => ['UI/UX Design', 'Web Interface Design', 'Solar Systems Integration'],
         'social' => [
@@ -58,7 +58,7 @@ $team_members = [
     [
         'name' => 'Marcus Cedric S. Pedrosa',
         'role' => 'Monitoring System Developer & Hardware Engineer',
-        'image' => 'img/member4.png',
+        'image' => '../assets/img/member4.png',
         'bio' => 'Managed both the backend development and hardware implementation of the EcoBench monitoring system.',
         'expertise' => ['IoT Systems', 'Hardware Integration', 'Monitoring & Data Systems'],
         'social' => [
@@ -71,7 +71,7 @@ $team_members = [
     [
         'name' => 'Quinn harvey G. Pineda',
         'role' => 'Project Coordinator & Technical Specialist',
-        'image' => 'img/member5.png',
+        'image' => '../assets/img/member5.png',
         'bio' => 'Coordinated project tasks and progress while providing technical support and implementation for the solar power component and overall system of the EcoBench.',
         'expertise' => ['Hardware Integration', 'Solar Power Systems', 'System Support & Integration'],
         'social' => [
@@ -169,10 +169,10 @@ $core_values = [
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Stylesheet -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="../assets/image/png" href="favicon.png">
     <style>
         /* ===================================
    ENHANCED ABOUT PAGE STYLES
@@ -1209,7 +1209,7 @@ $core_values = [
         <div class="container">
             <div class="header-content">
                 <a href="index.php" class="logo">
-                    <img class="logo-icon" src="img/EcoBench Logo.png" alt="EcoBench Logo">
+                    <img class="logo-icon" src="../assets/img/EcoBench Logo.png" alt="EcoBench Logo">
                 </a>
 
                 <nav class="nav-menu" id="navMenu">
@@ -1487,7 +1487,7 @@ $core_values = [
             <div class="footer-content">
                 <div class="footer-brand">
                     <div class="logo">
-                        <img class="logo-icon" src="img/EcoBench Logo.png" alt="EcoBench Logo">
+                        <img class="logo-icon" src="../assets/img/EcoBench Logo.png" alt="EcoBench Logo">
                     </div>
                     <div class="social-links">
                         <a href="#" aria-label="Facebook"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -1542,7 +1542,7 @@ $core_values = [
     </footer>
 
     <!-- JavaScript -->
-    <script src="script.js"></script>
+    <script src="../assets/js/script.js"></script>
 </body>
 
 </html>

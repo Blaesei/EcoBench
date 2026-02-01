@@ -1,6 +1,6 @@
 <?php
 
-include("auth.php");
+include("../includes/auth.php");
 
 ?>
 
@@ -16,7 +16,7 @@ include("auth.php");
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* ===================================
@@ -882,17 +882,17 @@ include("auth.php");
     <header id="header">
         <div class="container">
             <div class="header-content">
-                <a href="index.php" class="logo">
-                    <img class="logo-icon" src="img/EcoBench Logo.png" alt="EcoBench Logo">
+                <a href="/public/index.php" class="logo">
+                    <img class="logo-icon" src="/assets/img/EcoBench Logo.png" alt="EcoBench Logo">
                 </a>
 
                 <nav class="nav-menu" id="navMenu">
                     <ul>
-                        <li><a href="index.php" class="nav-link">Home</a></li>
-                        <li><a href="faqs.php" class="nav-link active">FAQs</a></li>
-                        <li><a href="about.php" class="nav-link">About Us</a></li>
-                        <li><a href="contact.php" class="nav-link">Contact</a></li>
-                        <li><a href="signin.php" class="nav-link sign-in-btn">Logout</a></li>
+                        <li><a href="/public/index.php" class="nav-link">Home</a></li>
+                        <li><a href="/public/faqs.php" class="nav-link active">FAQs</a></li>
+                        <li><a href="/public/about.php" class="nav-link">About Us</a></li>
+                        <li><a href="/public/contact.php" class="nav-link">Contact</a></li>
+                        <li><a href="/public/signin.php" class="nav-link sign-in-btn">Logout</a></li>
                     </ul>
                 </nav>
 
@@ -1274,7 +1274,7 @@ include("auth.php");
                 <p>We'd love to hear from you! Whether you have questions about our project, suggestions for improvement, or opportunities for collaboration, feel free to reach out.</p>
 
                 <div class="cta-buttons-group">
-                    <a href="contact.php" class="btn btn-primary btn-large">
+                    <a href="/public/contact.php" class="btn btn-primary btn-large">
                         <span>Contact Us</span>
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                             <path d="M4 10H16M16 10L10 4M16 10L10 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
@@ -1291,7 +1291,7 @@ include("auth.php");
             <div class="footer-content">
                 <div class="footer-brand">
                     <div class="logo">
-                        <img class="logo-icon" src="img/EcoBench Logo.png" alt="EcoBench Logo">
+                        <img class="logo-icon" src="/assets/img/EcoBench Logo.png" alt="EcoBench Logo">
                     </div>
                     <div class="social-links">
                         <a href="#" aria-label="Facebook"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -1312,19 +1312,19 @@ include("auth.php");
                     <div class="footer-column">
                         <h4>Quick Links</h4>
                         <ul>
-                            <li><a href="index.php">Home</a></li>
-                            <li><a href="faqs.php">FAQs</a></li>
-                            <li><a href="about.php">About Us</a></li>
-                            <li><a href="contact.php">Contact</a></li>
+                            <li><a href="/public/index.php">Home</a></li>
+                            <li><a href="/public/faqs.php">FAQs</a></li>
+                            <li><a href="/public/about.php">About Us</a></li>
+                            <li><a href="/public/contact.php">Contact</a></li>
                         </ul>
                     </div>
 
                     <div class="footer-column">
                         <h4>For Users</h4>
                         <ul>
-                            <li><a href="signin.php">Sign In</a></li>
-                            <li><a href="faqs.php">Help Center</a></li>
-                            <li><a href="contact.php">Feedback</a></li>
+                            <li><a href="/public/signin.php">Sign In</a></li>
+                            <li><a href="/public/faqs.php">Help Center</a></li>
+                            <li><a href="/public/contact.php">Feedback</a></li>
                         </ul>
                     </div>
 
@@ -1345,7 +1345,7 @@ include("auth.php");
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="../assets/js/script.js"></script>
     <script>
         // FAQ Toggle
         document.querySelectorAll('.faq-question').forEach(question => {

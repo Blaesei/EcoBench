@@ -1,6 +1,6 @@
 <?php
-// signin.php - Updated: Admin vs Normal user redirect + login with username only
-require('db.php');
+
+require(__DIR__ . '/../includes/db.php');
 session_start();
 
 $errors = [];
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Check if this is the admin user
             if (strtolower($row['username']) === 'admin') {
-                header("Location: dashboard.php"); // Admin goes to dashboard
+                header("Location: ../admin/dashboard.php"); // Admin goes to dashboard
             } else {
                 header("Location: index.php"); // Normal users go to index.php
             }
@@ -630,7 +630,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="signin-container">
         <div class="logo-wrapper">
-            <img src="img/EcoBench Logo.png" alt="EcoBench Logo" class="logo-img">
+            <img src="../assets/img/EcoBench Logo.png" alt="EcoBench Logo" class="logo-img">
         </div>
 
         <div class="signin-card">

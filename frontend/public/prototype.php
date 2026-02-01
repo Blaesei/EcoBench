@@ -160,15 +160,15 @@
             </div>
             
             <nav class="space-y-2">
-                <a href="index.php" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
+                <a href="/public/index.php" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
                     <i class="fas fa-home w-5"></i>
                     <span>Home</span>
                 </a>
-                <a href="pro_faqs.php" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
+                <a href="/public/faqs.php" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
                     <i class="fas fa-question-circle w-5"></i>
                     <span>FAQs</span>
                 </a>
-                <a href="dashboard.php" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
+                <a href="/admin/dashboard.php" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
                     <i class="fas fa-chart-line w-5"></i>
                     <span>Dashboard</span>
                 </a>
@@ -176,7 +176,7 @@
                     <i class="fas fa-cube w-5"></i>
                     <span>Prototype</span>
                 </a>
-                <a href="pro_contact.php" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
+                <a href="/public/contact.php" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium">
                     <i class="fas fa-envelope w-5"></i>
                     <span>Contact</span>
                 </a>
@@ -476,10 +476,10 @@
                 Visit our campus to see the EcoBench prototype in action and experience the future of sustainable public infrastructure.
             </p>
             <div class="flex gap-4 justify-center flex-wrap">
-                <a href="dashboard.php" class="inline-block px-8 py-4 bg-white text-green-700 font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                <a href="/admin/dashboard.php" class="inline-block px-8 py-4 bg-white text-green-700 font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all">
                     <i class="fas fa-chart-line mr-2"></i>View Dashboard
                 </a>
-                <a href="pro_contact.php" class="inline-block px-8 py-4 bg-yellow-400 text-gray-900 font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                <a href="/public/contact.php" class="inline-block px-8 py-4 bg-yellow-400 text-gray-900 font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all">
                     <i class="fas fa-envelope mr-2"></i>Contact Us
                 </a>
             </div>
