@@ -63,6 +63,26 @@ async function fetchSensorData() {
     }
 }
 
+// When data arrives from backend
+function updatePorts(portsData) {
+    portsData.forEach((port, index) => {
+        const portElement = document.querySelector(`.port-item:nth-child(${index + 1})`);
+        
+        if (port.is_active) {
+            portElement.classList.remove('port-available');
+            portElement.classList.add('port-charging');
+            portElement.querySelector('.port-status').textContent = 'CHARGING';
+            portElement.querySelector('.port-specs').textContent = 
+                `${port.voltage}V / ${port.current.toFixed(1)}A`;
+        } else {
+            portElement.classList.remove('port-charging');
+            portElement.classList.add('port-available');
+            portElement.querySelector('.port-status').textContent = 'AVAILABLE';
+            portElement.querySelector('.port-specs').textContent = 'Ready';
+        }
+    });
+}
+
 // ===================================
 // UPDATE DASHBOARD WITH REAL DATA
 // ===================================

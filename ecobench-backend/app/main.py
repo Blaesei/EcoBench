@@ -127,6 +127,22 @@ class SensorDataInput(BaseModel):
             }
         }
 
+class PortInfo(BaseModel):
+    port_number: int
+    device_type: str
+    is_active: bool
+    status: str
+    current: float
+    voltage: Optional[float] = None
+    power: Optional[float] = None
+
+class EnhancedSensorDataInput(BaseModel):
+    voltage: float
+    current: float
+    ports: List[PortInfo]
+    active_ports: int
+    available_ports: int        
+
 class CurrentStatusResponse(BaseModel):
 
     last_update: datetime
@@ -403,6 +419,17 @@ async def receive_sensor_data(data : SensorDataInput, db: Session = Depends(get_
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.post("/api/sensor-data-enhanced")
+async def receive_enhanced_sensor_data(data: EnhancedSensorDataInput, db: Session = Depends(get_db)):
+    # Process basic data
+    basic_data = SensorDataInput(voltage=data.voltage, current=data.current)
+    result = DataService.process_sensor_data(basic_data, db)
+    
+    # Store port information (optional - for future use)
+    # To add a ports table later if needed
+    
+    return result
 
 @app.get("/api/status/current", response_model=CurrentStatusResponse)
 async def get_current_status(db: Session = Depends(get_db)):
