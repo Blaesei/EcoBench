@@ -1,4 +1,4 @@
-# Sensitive Configuration Files
+# Sensitive Configuration 
 backend/.env
 frontend/includes/db.php
 

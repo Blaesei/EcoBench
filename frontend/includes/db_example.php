@@ -1,6 +1,6 @@
 <?php
 
-$con = mysqli_connect("localhost","root","Marcus@11%","ecobench_db");
+$con = mysqli_connect("localhost","root","Password","database_name");
 // Check connection
 if (mysqli_connect_errno())
   {
