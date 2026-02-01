@@ -123,6 +123,8 @@ function updateDashboardWithRealData(data) {
     
     // Charge rate
     const chargeRate = data.charge_rate || 0;
+    // Update port status based on discharge
+    updatePortStatusFromDischarge(chargeRate, data.discharge_rate || 0);
     const chargeRateEl = document.getElementById('chargeRateDisplay');
     if (chargeRateEl) {
         chargeRateEl.textContent = (chargeRate > 0 ? '+' : '') + chargeRate.toFixed(1) + 'A';
@@ -282,41 +284,40 @@ function updateAnalytics(currentPower, chargeRate) {
         efficiencyEl.textContent = efficiency.toFixed(0) + '%';
     }
 }
-
-// ===================================
-// PORT STATUS RANDOMIZATION (Keep your original logic)
-// ===================================
-
-function randomizePortStatus() {
+ // === Port Status Update Based on Discharge Rate ===
+function updatePortStatusFromDischarge(chargeRate, dischargeRate) {
     const ports = document.querySelectorAll('.port-item');
+    let activePorts = 0;
     
-    if (Math.random() > 0.7 && ports.length > 0) {
-        const randomPort = ports[Math.floor(Math.random() * ports.length)];
+    // Only show ports as active when battery is DISCHARGING
+    if (dischargeRate > 0.3) {
+        if (dischargeRate >= 0.4 && dischargeRate <= 1.5) activePorts = 1;
+        else if (dischargeRate >= 1.6 && dischargeRate <= 3.0) activePorts = 2;
+        else if (dischargeRate >= 3.1 && dischargeRate <= 4.5) activePorts = 3;
+        else if (dischargeRate >= 4.6) activePorts = 4;
+    }
+    
+    // Update each port
+    ports.forEach((port, index) => {
+        const statusEl = port.querySelector('.port-status');
+        const specsEl = port.querySelector('.port-specs');
         
-        if (randomPort.classList.contains('port-charging')) {
-            randomPort.classList.remove('port-charging');
-            randomPort.classList.add('port-available');
-            const statusEl = randomPort.querySelector('.port-status');
-            const specsEl = randomPort.querySelector('.port-specs');
+        if (index < activePorts) {
+            port.classList.remove('port-available');
+            port.classList.add('port-charging');
+            if (statusEl) statusEl.textContent = 'CHARGING';
+            const currentPerPort = (dischargeRate / activePorts).toFixed(1);
+            if (specsEl) specsEl.textContent = `5.0V / ${currentPerPort}A`;
+        } else {
+            port.classList.remove('port-charging');
+            port.classList.add('port-available');
             if (statusEl) statusEl.textContent = 'AVAILABLE';
             if (specsEl) specsEl.textContent = 'Ready';
-        } else {
-            randomPort.classList.remove('port-available');
-            randomPort.classList.add('port-charging');
-            const statusEl = randomPort.querySelector('.port-status');
-            const specsEl = randomPort.querySelector('.port-specs');
-            if (statusEl) statusEl.textContent = 'CHARGING';
-            const voltage = (5.0).toFixed(1);
-            const current = (1.5 + Math.random() * 1.0).toFixed(1);
-            if (specsEl) specsEl.textContent = `${voltage}V / ${current}A`;
         }
-        
-        // Update port counts
-        const activePorts = document.querySelectorAll('.port-item.port-charging').length;
-        const availablePorts = document.querySelectorAll('.port-item.port-available').length;
-        updateElement('portsActive', activePorts);
-        updateElement('portsAvailable', availablePorts);
-    }
+    });
+    
+    updateElement('portsActive', activePorts);
+    updateElement('portsAvailable', 4 - activePorts);
 }
 
 // ===================================
@@ -408,8 +409,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update dashboard with real data every 5 seconds
     updateInterval = setInterval(fetchSensorData, UPDATE_INTERVAL);
     
-    // Randomize port status every 10 seconds
-    setInterval(randomizePortStatus, 10000);
     
     // Attach crank toggle event
     const crankToggleButton = document.getElementById('crankToggle');
