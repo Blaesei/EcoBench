@@ -6,7 +6,7 @@ A solar-powered charging bench with IoT monitoring, featuring real-time energy t
 
 **Institution:** Polytechnic University of the Philippines - Institute of Technology  
 **Program:** Diploma in Computer Engineering Technology  
-**Course:** Research Project  
+ 
 
 ### Team Members
 - Jigs C. Lactao
