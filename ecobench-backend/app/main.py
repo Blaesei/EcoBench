@@ -221,7 +221,6 @@ class DataService:
     @staticmethod
     @staticmethod
     def process_sensor_data(data: SensorDataInput, db: Session) -> CurrentStatusResponse:
-        """Process incoming sensor data and update system status"""
         
         # Calculate metrics
         power = EnergyCalculator.calculate_power(data.voltage, abs(data.current))
