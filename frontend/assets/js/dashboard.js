@@ -136,7 +136,7 @@ function updateDashboardWithRealData(data) {
     updateElement('runtimeDisplay', runtime.toFixed(1) + 'h');
     
     // Capacity (calculate from battery percentage and capacity)
-    const capacity = ((batteryPercent / 100) * 300).toFixed(1); // 300Ah battery
+    const capacity = ((batteryPercent / 100) * 2.0).toFixed(1); // 300Ah battery
     updateElement('capacityDisplay', capacity + 'Ah');
     
     // ENERGY BALANCE

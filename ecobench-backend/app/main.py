@@ -30,7 +30,7 @@ class Config:
     ]
 
     # Battery Configuration (Prototype Values)
-    BATTERY_MIN_VOLTAGE = 5.0
+    BATTERY_MIN_VOLTAGE = 6.0
     BATTERY_MAX_VOLTAGE = 9.0
     BATTERY_CAPACITY_AH = 2.0  
 
