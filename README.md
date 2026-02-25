@@ -18,7 +18,7 @@ A solar-powered charging bench with IoT monitoring, featuring real-time energy t
 ## ✨ Features
 
 - ⚡ **Solar Power Generation** - 300W monocrystalline panel
-- 🔋 **Battery Storage** - 300Ah LiFePO4 battery bank
+- 🔋 **Battery Storage** - 12V 100Ah LiFePO4 battery bank
 - 🔌 **Multi-Port Charging** - USB-C and Lightning ports
 - 📱 **IoT Monitoring** - Real-time web dashboard
 - 🖐️ **Manual Backup** - Hand crank generator
