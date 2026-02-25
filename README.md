@@ -46,7 +46,7 @@ Solar Panel → Charge Controller → Battery → Buck Converter → Charging Po
 - 2.9" E-Ink Display
 - LM2596 Buck Converter
 - 300W Solar Panel
-- 300Ah LiFePO4 Battery
+- 12V 100Ah LiFePO4 Battery
 - Manual Crank Generator
 
 ## 💻 Tech Stack
